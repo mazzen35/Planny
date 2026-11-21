@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Plan Builder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=IBM+Plex+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
+<style>/* Layout idea: a single phone-width column with a bottom tab bar; wide screens center it at 720px. */
+:root{--bg:#f4f5f1;--card:#ffffff;--ink:#1c2826;--mut:#5f6d6a;--line:#dfe3dd;--acc:#0f766e;--acc-ink:#ffffff;--ok:#15803d;--warn:#b45309;--bad:#b91c1c;--soft:#e9efec;
+ --f:'IBM Plex Sans','IBM Plex Sans Arabic',system-ui,-apple-system,'Segoe UI',Tahoma,sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#101615;--card:#18201f;--ink:#e6ecea;--mut:#9aa9a6;--line:#2b3735;--acc:#2dd4bf;--acc-ink:#06201d;--ok:#4ade80;--warn:#fbbf24;--bad:#f87171;--soft:#1f2b29;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#101615;--card:#18201f;--ink:#e6ecea;--mut:#9aa9a6;--line:#2b3735;--acc:#2dd4bf;--acc-ink:#06201d;--ok:#4ade80;--warn:#fbbf24;--bad:#f87171;--soft:#1f2b29;color-scheme:dark}
+*{box-sizing:border-box}html,body{margin:0}body{background:var(--bg);color:var(--ink);font-family:var(--f);font-size:16px;line-height:1.5;padding-bottom:84px}
+header{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+.hd{max-width:720px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.hd h1{font-size:18px;margin:0;font-weight:700;letter-spacing:-.01em}
+main{max-width:720px;margin:0 auto;padding:16px}
+h2{font-size:22px;margin:0 0 4px;text-wrap:balance}h3{font-size:16px;margin:0 0 10px}
+.lead{color:var(--mut);margin:0 0 16px;max-width:65ch}.note{color:var(--mut);font-size:14px;margin:6px 0}
+button,select,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin:0 0 16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+label{display:flex;flex-direction:column;gap:4px;font-size:14px;color:var(--mut)}
+input[type=text],input[type=date],input[type=time],input[type=number],select,textarea{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 10px;color:var(--ink);width:100%;min-height:42px}
+textarea{resize:vertical}
+.fl{font-size:14px;color:var(--mut);margin:14px 0 6px}.fl2{margin:12px 0}
+.dcb{display:flex;flex-wrap:wrap;gap:6px}.dcb label{flex-direction:row;align-items:center}
+.dcb input{position:absolute;opacity:0}.dcb span{display:block;padding:8px 12px;border:1px solid var(--line);border-radius:999px;color:var(--ink);background:var(--bg);min-width:48px;text-align:center;font-size:14px}
+.dcb input:checked+span{background:var(--acc);color:var(--acc-ink);border-color:var(--acc)}.dcb input:focus-visible+span{outline:3px solid var(--acc);outline-offset:2px}
+.sec{border-top:1px solid var(--line);padding:4px 0}.sec summary{cursor:pointer;padding:10px 0;font-weight:600;border-inline-start:4px solid var(--sc);padding-inline-start:10px}
+.sec summary em,.crs em{font-style:normal;color:var(--mut);font-weight:400;font-size:13px;margin-inline-start:6px}
+.crs{padding:8px 0 8px 0}.crs.on{background:var(--soft);border-radius:10px;padding:8px 10px;margin:4px 0}
+.ck{display:flex;flex-direction:row;align-items:center;gap:10px;color:var(--ink);font-size:15px;justify-content:space-between}
+label.ck{justify-content:flex-start}.ck input{width:20px;height:20px;accent-color:var(--acc)}
+.ctl{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}.ctl select{width:auto;min-width:130px}.mini{flex-direction:row;align-items:center;gap:6px}.mini input{width:84px}
+.row{display:flex;gap:10px;align-items:center}.row.wrap{flex-wrap:wrap;margin:10px 0}
+.btn,.ghost,.primary{display:inline-flex;align-items:center;justify-content:center;border-radius:10px;padding:10px 14px;min-height:44px;font-weight:600;text-decoration:none;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+.btn{background:var(--soft)}
+.ghost.danger{color:var(--bad);border-color:var(--bad)}
+.primary{background:var(--acc);color:var(--acc-ink);border-color:var(--acc);width:100%;margin:0 0 16px;font-size:17px;min-height:52px}.primary.sm{width:auto;margin:12px 0 0}.primary:disabled{opacity:.45;cursor:not-allowed}
+.link{background:none;border:0;color:var(--acc);padding:6px 0;font-weight:600;text-decoration:underline}
+.cap .bar{height:10px}.cap.warn .bar i{background:var(--warn)}.cap.bad .bar i{background:var(--bad)}.cap.ok .bar i{background:var(--ok)}
+.bar{height:8px;background:var(--soft);border-radius:99px;overflow:hidden;flex:1}.bar i{display:block;height:100%;background:var(--acc);border-radius:99px}
+.daynav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}.daynav>div{text-align:center;flex:1}.daynav p{margin:0;color:var(--mut);font-size:14px}
+.daynav button{width:46px;height:46px;border-radius:12px;border:1px solid var(--line);background:var(--card);font-size:24px;line-height:1}
+[dir=rtl] .daynav button{transform:scaleX(-1)}
+.banner{background:var(--soft);border-radius:10px;padding:10px 12px;margin:10px 0;font-size:15px}
+.dprog{display:flex;align-items:center;gap:10px;margin:8px 0 14px;font-size:14px;color:var(--mut)}
+.work{border:1px dashed var(--line);border-radius:12px;padding:10px 12px;color:var(--mut);margin:0 0 10px;font-size:14px}
+.empty{color:var(--mut);padding:24px 0;text-align:center}
+.ev{display:grid;grid-template-columns:84px 1fr auto;gap:12px;background:var(--card);border:1px solid var(--line);border-inline-start:5px solid var(--sc);border-radius:14px;padding:12px;margin:0 0 10px;align-items:start}
+.ev .tm{display:flex;flex-direction:column;font-variant-numeric:tabular-nums;font-size:13px;color:var(--mut);line-height:1.35}.ev .tm b{color:var(--ink);font-size:14px}.ev .tm i{font-style:normal;margin-top:4px}
+.sn{font-size:12px;font-weight:700;color:var(--sc);text-transform:uppercase;letter-spacing:.03em}[dir=rtl] .sn{text-transform:none;letter-spacing:0}
+.tt{font-weight:600;margin:2px 0;overflow-wrap:anywhere}
+details summary{cursor:pointer;color:var(--mut);font-size:14px;padding:4px 0}
+.steps{margin:6px 0;padding-inline-start:20px;font-size:14px}.steps li{margin:4px 0}.mn{color:var(--mut);white-space:nowrap}
+.ex{list-style:none;padding:0;margin:6px 0;font-size:14px}.ex li{display:flex;gap:10px;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)}.ex span{flex:1}.ex a{color:var(--acc);text-decoration:none;padding:4px 10px;border:1px solid var(--line);border-radius:8px}
+.sub{font-weight:600;font-size:14px;margin:8px 0 0}.tl{font-size:14px;padding-inline-start:20px;margin:6px 0}
+.mks{display:flex;flex-direction:column;gap:6px}
+.mk{width:44px;height:40px;border-radius:10px;border:1px solid var(--line);background:var(--bg);font-size:17px;font-weight:700}
+.mk[aria-pressed=true].mk-d{background:var(--ok);color:#fff;border-color:var(--ok)}.mk[aria-pressed=true].mk-h{background:var(--warn);color:#fff;border-color:var(--warn)}.mk[aria-pressed=true].mk-n{background:var(--bad);color:#fff;border-color:var(--bad)}
+.ev.st-d{opacity:.82}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:8px}.chip{min-width:42px;height:42px;border-radius:10px;border:1px solid var(--line);background:var(--card)}.chip.on{background:var(--acc);color:var(--acc-ink);border-color:var(--acc)}
+.wk{margin:6px 0 10px}
+.prow{display:flex;align-items:center;gap:12px;width:100%;text-align:start;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin:0 0 8px;min-height:56px}
+.prow.now{border-color:var(--acc);box-shadow:0 0 0 2px var(--acc) inset}
+.pd{display:flex;flex-direction:column;min-width:110px}.pd small{color:var(--mut)}
+.dots{display:flex;gap:4px;flex:1}.dots i{width:10px;height:10px;border-radius:50%}
+.pc{color:var(--mut);font-size:14px;font-variant-numeric:tabular-nums}
+.tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:6px}.tiles div{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}.tiles b{display:block;font-size:28px;font-variant-numeric:tabular-nums}.tiles span{color:var(--mut);font-size:14px}
+.wbars{display:flex;gap:4px;align-items:flex-end;height:120px;margin-bottom:8px}.wb{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%}.wb>div{flex:1;width:100%;background:var(--soft);border-radius:6px;display:flex;align-items:flex-end;overflow:hidden}.wb i{display:block;width:100%;background:var(--acc)}.wb small{font-size:11px;color:var(--mut)}
+.srow{display:flex;align-items:center;gap:10px;margin:8px 0;font-size:14px}.srow>span{width:42%;overflow-wrap:anywhere}.srow .bar i{background:var(--sc)}.srow b{font-variant-numeric:tabular-nums;width:56px;text-align:end}
+nav{position:fixed;inset-inline:0;bottom:0;background:var(--card);border-top:1px solid var(--line);z-index:6;padding-bottom:env(safe-area-inset-bottom)}
+#nav{max-width:720px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
+#nav button{background:none;border:0;padding:10px 4px;min-height:62px;display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--mut);font-size:12px}#nav button.on{color:var(--acc);font-weight:700}#nav button:disabled{opacity:.4}
+#nav svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#toast{position:fixed;inset-inline:16px;bottom:96px;max-width:520px;margin:0 auto;background:var(--ink);color:var(--bg);padding:12px 14px;border-radius:12px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:9;font-size:14px}#toast.on{opacity:1}
+#confirm{position:fixed;inset-inline:16px;bottom:96px;max-width:520px;margin:0 auto;background:var(--card);border:1px solid var(--bad);padding:14px;border-radius:12px;display:none;z-index:9}#confirm.on{display:block}#confirm p{margin:0 0 10px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media (max-width:420px){.ev{grid-template-columns:72px 1fr auto;padding:10px}.pd{min-width:90px}}
+</style></head><body>
+<header><div class="hd"><h1 id="ttl">Plan Builder</h1><button class="link" id="langbtn" type="button">العربية</button></div></header>
+<main id="app"></main>
+<div id="toast" role="status" aria-live="polite"></div><div id="confirm" role="alertdialog"></div>
+<nav><div id="nav">
+<button data-v="today" type="button"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>Today</span></button>
+<button data-v="plan" type="button"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg><span>Plan</span></button>
+<button data-v="progress" type="button"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg><span>Progress</span></button>
+<button data-v="setup" type="button"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/></svg><span>Setup</span></button>
+</div></nav>
+<script>
+// Library: [id, section, kind, sessions/wk, minutes, slot, "En | عربي", topics "En | عربي" separated by ;;]
+const SECTIONS=[
+ {id:'prof',en:'Professional development',ar:'التطوير المهني',color:'#b45309'},
+ {id:'office',en:'Microsoft Office',ar:'الأوفيس',color:'#2563eb'},
+ {id:'acct',en:'Careers: Accounting',ar:'الوظائف: المحاسبة',color:'#0f766e'},
+ {id:'prog',en:'Programming & data',ar:'البرمجة والبيانات',color:'#7c3aed'},
+ {id:'lang',en:'Languages',ar:'اللغات',color:'#db2777'},
+ {id:'quran',en:'Quran & religion',ar:'القرآن والدين',color:'#15803d'},
+ {id:'health',en:'Health & fitness',ar:'الصحة واللياقة',color:'#dc2626'},
+ {id:'custom',en:'My own subjects',ar:'موادي الخاصة',color:'#475569'}
+];
+const RAW=[
+['time','prof','study',3,30,'evening','Time management & productivity | إدارة الوقت والإنتاجية',
+ 'Where your time goes: a one-week time audit | أين يذهب وقتك: تتبع أسبوع كامل;;Priorities: urgent vs important | الأولويات: العاجل مقابل المهم;;Planning your week and your day | تخطيط الأسبوع واليوم;;Deep work and handling distractions | العمل العميق وإدارة المشتتات;;Meetings and email without losing hours | الاجتماعات والإيميل بدون إهدار الوقت;;Saying no and setting boundaries | قول لا ووضع الحدود;;Building habits that stick | بناء عادات تدوم;;Your personal system: review and adjust | نظامك الشخصي: المراجعة والتعديل'],
+['comm','prof','study',3,30,'evening','Communication & presentation | التواصل والعرض',
+ 'Clear thinking before speaking | ترتيب الفكرة قبل الكلام;;Structuring a message: point, reason, example | بناء الرسالة: الفكرة والسبب والمثال;;Active listening | الإنصات الفعّال;;Body language and voice | لغة الجسد والصوت;;Designing a short presentation | تصميم عرض قصير;;Handling questions and pushback | التعامل مع الأسئلة والاعتراض;;Giving and receiving feedback | تقديم الملاحظات وتلقيها;;Practice: deliver a 5-minute talk | تطبيق: ألقِ عرضًا لمدة ٥ دقائق'],
+['write','prof','study',2,30,'evening','Professional writing: emails & reports | الكتابة المهنية: الإيميلات والتقارير',
+ 'Anatomy of a good work email | مكونات إيميل العمل الجيد;;Subject lines and tone | عناوين الرسائل والأسلوب;;Writing short and clear | الكتابة المختصرة والواضحة;;Structuring a report | هيكلة التقرير;;Summaries and recommendations | الملخصات والتوصيات;;Editing and proofreading | التحرير والمراجعة اللغوية;;Difficult emails: delays, refusals, complaints | الإيميلات الصعبة: التأخير والرفض والشكاوى'],
+['nego','prof','study',2,30,'evening','Negotiation & problem solving | التفاوض وحل المشكلات',
+ 'Defining the real problem | تحديد المشكلة الحقيقية;;Root-cause analysis (5 whys) | تحليل الأسباب الجذرية;;Generating and comparing options | توليد الخيارات ومقارنتها;;Interests vs positions in negotiation | المصالح مقابل المواقف في التفاوض;;Preparing a negotiation: your alternatives | التحضير للتفاوض: بدائلك;;Handling conflict calmly | التعامل مع الخلاف بهدوء;;Closing and following up on agreements | إغلاق الاتفاق ومتابعته'],
+['lead','prof','study',2,30,'evening','Leadership & team management | القيادة وإدارة الفريق',
+ 'From colleague to leader | من زميل إلى قائد;;Setting clear goals and expectations | وضع أهداف وتوقعات واضحة;;Delegation | التفويض;;One-to-one meetings | الاجتماعات الفردية;;Motivating different people | تحفيز الأشخاص المختلفين;;Running effective team meetings | إدارة اجتماعات فريق فعّالة;;Performance conversations | محادثات الأداء;;Leading through change | القيادة وقت التغيير'],
+['career','prof','study',2,30,'evening','CV, LinkedIn & interviews | السيرة الذاتية وLinkedIn والمقابلات',
+ 'Defining your target role | تحديد الوظيفة المستهدفة;;Writing a one-page CV | كتابة CV في صفحة واحدة;;Achievements instead of duties | الإنجازات بدل المهام;;LinkedIn profile | ملف LinkedIn;;Cover letters and applications | خطابات التقديم والطلبات;;Common interview questions | أسئلة المقابلات الشائعة;;Behavioral answers with the STAR method | الإجابات السلوكية بطريقة STAR;;Salary conversation and follow-up | مناقشة الراتب والمتابعة'],
+['excel','office','study',4,45,'evening','Excel | إكسل',
+ 'Interface, cells and number formats | الواجهة والخلايا وتنسيق الأرقام;;Formulas and absolute references | الصيغ والمراجع المطلقة;;Essential functions: SUM, IF, COUNTIFS, SUMIFS | دوال أساسية: SUM وIF وCOUNTIFS وSUMIFS;;Lookup: XLOOKUP and INDEX/MATCH | البحث: XLOOKUP وINDEX/MATCH;;Text and date functions | دوال النصوص والتواريخ;;Sorting, filtering and tables | الفرز والتصفية والجداول;;Data validation and drop-down lists | التحقق من البيانات والقوائم المنسدلة;;Conditional formatting | التنسيق الشرطي;;PivotTables and slicers | الجداول المحورية والـ Slicers;;Charts | الرسوم البيانية;;Dashboards | لوحات المتابعة;;Protecting and sharing workbooks | حماية الملفات ومشاركتها'],
+['word','office','study',2,40,'evening','Word | وورد',
+ 'Styles and headings | الأنماط والعناوين;;Page layout, margins and sections | تخطيط الصفحة والهوامش والأقسام;;Tables of contents and page numbers | الفهارس وترقيم الصفحات;;Tables and images | الجداول والصور;;Templates | القوالب;;Mail merge | دمج المراسلات;;Track changes and comments | تتبع التغييرات والتعليقات;;Long document workflow | العمل على مستند طويل'],
+['ppt','office','study',2,40,'evening','PowerPoint | باوربوينت',
+ 'Story first: structuring a deck | القصة أولًا: هيكلة العرض;;Slide master and layouts | الشريحة الرئيسية والتخطيطات;;Text, color and fonts | النصوص والألوان والخطوط;;Charts and tables on slides | الرسوم والجداول في الشرائح;;Icons, images and diagrams | الأيقونات والصور والمخططات;;Animations and transitions, used sparingly | الحركات والانتقالات باعتدال;;Presenting: notes and timing | العرض: الملاحظات والتوقيت'],
+['outlook','office','study',1,30,'evening','Outlook, Teams & OneNote | آوتلوك وتيمز ووان نوت',
+ 'Outlook: folders, rules and search | آوتلوك: المجلدات والقواعد والبحث;;Outlook: calendar and meeting invites | آوتلوك: التقويم ودعوات الاجتماعات;;Outlook: tasks and flags | آوتلوك: المهام والعلامات;;Teams: channels, chats and files | تيمز: القنوات والمحادثات والملفات;;Teams: meetings and screen sharing | تيمز: الاجتماعات ومشاركة الشاشة;;OneNote: notebooks and tags | وان نوت: الدفاتر والوسوم'],
+['fin','acct','study',4,45,'evening','Financial accounting | المحاسبة المالية',
+ 'What accounting is and the conceptual framework | ماهية المحاسبة والإطار المفاهيمي;;The accounting equation and account types | معادلة المحاسبة وأنواع الحسابات;;Double entry: debit and credit rules | القيد المزدوج: قواعد المدين والدائن;;The journal and the ledger | دفتر اليومية ودفتر الأستاذ;;The trial balance and its errors | ميزان المراجعة وأخطاؤه;;Adjusting entries: accruals and prepayments | قيود التسوية: المستحقات والمقدمات;;Depreciation and provisions | الإهلاك والمخصصات;;The income statement | قائمة الدخل;;The balance sheet | قائمة المركز المالي;;Cash and bank reconciliation | النقدية وتسوية البنك;;Receivables and bad debts | العملاء والديون المعدومة;;Inventory: FIFO and weighted average | المخزون: الوارد أولًا والمتوسط;;Fixed assets and disposal | الأصول الثابتة والاستبعاد;;Liabilities and revenue recognition | الالتزامات والاعتراف بالإيراد;;Equity and cash flow statement | حقوق الملكية وقائمة التدفقات النقدية'],
+['cost','acct','study',3,45,'evening','Cost accounting | محاسبة التكاليف',
+ 'Cost concepts and classification | مفاهيم وتصنيف التكاليف;;Materials and labor costs | تكاليف المواد والأجور;;Manufacturing overhead | التكاليف الصناعية غير المباشرة;;Job-order costing | نظام الأوامر;;Process costing | نظام المراحل;;Cost-volume-profit and break-even | التكلفة والحجم والربح ونقطة التعادل;;Standard costing and variances | التكاليف المعيارية والانحرافات;;Budgets | الموازنات'],
+['audit','acct','study',3,45,'evening','Auditing | المراجعة',
+ 'The concept of auditing and its standards | مفهوم المراجعة ومعاييرها;;Ethics and independence | الأخلاقيات والاستقلال;;Understanding the entity and assessing risk | فهم المنشأة وتقييم المخاطر;;Materiality | الأهمية النسبية;;Internal control | الرقابة الداخلية;;Audit evidence and procedures | أدلة الإثبات وإجراءاتها;;Sampling | العينات;;Purchases and payments cycle | دورة المشتريات والمدفوعات;;Sales and receipts cycle | دورة المبيعات والمقبوضات;;Completion and the auditor\'s report | الإقفال وتقرير المراجع'],
+['tax','acct','study',3,45,'evening','Egyptian taxes | الضرائب المصرية',
+ 'The Egyptian tax system overview | نظرة عامة على النظام الضريبي المصري;;VAT: invoice, deduction and return | ضريبة القيمة المضافة: الفاتورة والخصم والإقرار;;VAT: exempt supplies and table taxes | القيمة المضافة: المعفاة وضريبة الجدول;;Withholding and collection on account (Form 41) | الخصم والتحصيل تحت حساب الضريبة (نموذج ٤١);;Payroll tax | ضريبة كسب العمل;;Corporate income tax | ضريبة الدخل على الشركات;;The e-invoice and e-receipt | الفاتورة والإيصال الإلكتروني;;Stamp duty and other taxes | ضريبة الدمغة وضرائب أخرى;;Tax inspection and disputes | الفحص الضريبي والمنازعات'],
+['mgmt','acct','study',2,40,'evening','Management accounting | المحاسبة الإدارية',
+ 'Role of the management accountant | دور المحاسب الإداري;;Budgeting process | عملية الموازنة;;Flexible budgets | الموازنات المرنة;;Performance measures and KPIs | مقاييس الأداء ومؤشراته;;Decision-making and relevant costs | اتخاذ القرار والتكاليف ذات الصلة;;Pricing decisions | قرارات التسعير;;Capital budgeting: NPV and IRR | الموازنة الرأسمالية: صافي القيمة الحالية ومعدل العائد'],
+['ifrs','acct','study',2,40,'evening','Accounting standards (EAS & IFRS) | معايير المحاسبة (المصرية والدولية)',
+ 'Standards framework and who issues them | إطار المعايير ومن يصدرها;;Presentation of financial statements | عرض القوائم المالية;;Inventories | المخزون;;Property, plant and equipment | الأصول الثابتة;;Revenue from contracts with customers | الإيراد من العقود مع العملاء;;Leases | عقود التأجير;;Impairment of assets | اضمحلال الأصول;;Financial instruments (intro) | الأدوات المالية (مدخل);;Consolidated statements (intro) | القوائم المجمعة (مدخل)'],
+['fa','acct','study',2,40,'evening','Financial analysis | التحليل المالي',
+ 'Reading the three statements together | قراءة القوائم الثلاث معًا;;Horizontal and vertical analysis | التحليل الأفقي والرأسي;;Liquidity ratios | نسب السيولة;;Profitability ratios | نسب الربحية;;Efficiency and activity ratios | نسب النشاط والكفاءة;;Leverage and solvency ratios | نسب المديونية والملاءة;;DuPont analysis | تحليل دوبونت;;Writing an analysis report | كتابة تقرير التحليل'],
+['cma','acct','study',4,45,'evening','Professional certificate prep (CMA / ACCA / CPA) | التحضير للشهادات المهنية',
+ 'Choose the certificate and read its syllabus | اختيار الشهادة وقراءة المنهج;;Build your exam calendar | بناء جدول الامتحانات;;Part 1: study the first unit | الجزء الأول: الوحدة الأولى;;Part 1: practice questions | الجزء الأول: أسئلة تدريبية;;Part 2: study the first unit | الجزء الثاني: الوحدة الأولى;;Part 2: practice questions | الجزء الثاني: أسئلة تدريبية;;Mock exam 1 | امتحان تجريبي ١;;Review weak areas | مراجعة نقاط الضعف;;Mock exam 2 | امتحان تجريبي ٢'],
+['py','prog','study',4,45,'evening','Python | بايثون',
+ 'Setup and first program | الإعداد وأول برنامج;;Variables and types | المتغيرات والأنواع;;Strings | النصوص;;Numbers and operations | الأرقام والعمليات;;Lists and tuples | القوائم والمجموعات;;Dictionaries | القواميس;;if conditions | الشروط if;;for and while loops | الحلقات for وwhile;;Functions | الدوال;;Reading and writing files | قراءة وكتابة الملفات;;Error handling with try/except | معالجة الأخطاء;;Modules and libraries | الوحدات والمكتبات;;pandas: DataFrame and reading Excel | pandas: DataFrame وقراءة Excel;;pandas: filtering, cleaning and merging | pandas: الفلترة والتنضيف والدمج;;Mini project: clean and summarize a file | مشروع صغير: تنضيف ملف وتلخيصه'],
+['sql','prog','study',3,45,'evening','SQL & databases | SQL وقواعد البيانات',
+ 'What a database is: tables and keys | ما هي قاعدة البيانات: الجداول والمفاتيح;;SELECT, WHERE and ORDER BY | SELECT وWHERE وORDER BY;;Aggregates and GROUP BY | الدوال التجميعية وGROUP BY;;Joins | الربط بين الجداول;;Subqueries | الاستعلامات الفرعية;;CASE and conditional logic | CASE والمنطق الشرطي;;Dates and strings | التواريخ والنصوص;;Window functions | دوال النوافذ;;Creating and changing tables | إنشاء الجداول وتعديلها;;Project: answer ten business questions | مشروع: الإجابة عن ١٠ أسئلة عمل'],
+['pq','prog','study',3,45,'evening','Power Query | باور كويري',
+ 'Loading a file and understanding the interface | تحميل ملف وفهم الواجهة;;Deleting, reordering and renaming columns | حذف وترتيب وإعادة تسمية الأعمدة;;Changing data types and dates | تغيير أنواع البيانات والتواريخ;;Filtering and removing duplicates and blanks | الفلترة وإزالة المكرر والفارغ;;Splitting and merging columns | تقسيم ودمج الأعمدة;;Conditional and custom columns | عمود شرطي وعمود مخصص;;Pivot and Unpivot | Pivot وUnpivot;;Append: combining several files | Append: دمج عدة ملفات;;Merge: Left, Inner and Anti | Merge: Left وInner وAnti;;From Folder: all monthly files | From Folder: كل ملفات الشهور;;A report that updates with Refresh | تقرير يتحدث بزر Refresh'],
+['pbi','prog','study',3,45,'evening','Power BI | باور بي آي',
+ 'Interface and loading data | الواجهة وتحميل البيانات;;Data model and relationships | نموذج البيانات والعلاقات;;Your first measures in DAX | أول مقاييس DAX;;Calculated columns vs measures | الأعمدة المحسوبة مقابل المقاييس;;Charts and visual choice | الرسوم واختيار المرئيات;;Filters and slicers | المرشحات والـ Slicers;;Time intelligence | الذكاء الزمني;;Publishing and sharing | النشر والمشاركة'],
+['web','prog','study',3,45,'evening','Web basics (HTML, CSS, JavaScript) | أساسيات الويب',
+ 'How the web works | كيف يعمل الويب;;HTML structure | هيكل HTML;;Text, links and images | النصوص والروابط والصور;;CSS selectors and colors | محددات CSS والألوان;;Layout with flexbox | التخطيط بـ flexbox;;Responsive design | التصميم المتجاوب;;JavaScript variables and functions | متغيرات ودوال JavaScript;;The DOM and events | الـ DOM والأحداث;;Forms and validation | النماذج والتحقق;;Project: a small personal page | مشروع: صفحة شخصية صغيرة'],
+['auto','prog','study',2,40,'evening','Work automation | أتمتة العمل',
+ 'Find tasks worth automating | اختيار المهام التي تستحق الأتمتة;;Excel macros: record and edit | ماكرو إكسل: التسجيل والتعديل;;Power Automate basics | أساسيات Power Automate;;Python for repetitive file tasks | بايثون لمهام الملفات المتكررة;;Scheduling and error handling | الجدولة ومعالجة الأخطاء;;Project: automate one real task | مشروع: أتمتة مهمة حقيقية'],
+['en','lang','lang',4,30,'evening','English for work | الإنجليزي للعمل',
+ 'Introductions and small talk | التعارف والحديث العابر;;Describing your job and company | وصف عملك وشركتك;;Phone calls and voice messages | المكالمات والرسائل الصوتية;;Emails: opening, request, closing | الإيميلات: البداية والطلب والخاتمة;;Meetings: agreeing and disagreeing politely | الاجتماعات: الاتفاق والاختلاف بأدب;;Presenting numbers and trends | عرض الأرقام والاتجاهات;;Asking for clarification | طلب التوضيح;;Negotiating and making offers | التفاوض وتقديم العروض;;Reports and short documents | التقارير والمستندات القصيرة;;Interviews | المقابلات;;Travel and hosting visitors | السفر واستضافة الزوار;;Idioms and phrasal verbs for work | تعبيرات وأفعال مركبة للعمل'],
+['es','lang','lang',4,30,'evening','Spanish (from zero) | الإسباني (من الصفر)',
+ 'The alphabet and pronunciation | الحروف والنطق;;Greetings and introductions | التحيات والتعارف;;Gender and number (el/la) | الجنس والعدد;;Numbers 0–100 | الأرقام ٠–١٠٠;;ser: I am / you are / he is | ser: أنا/أنت/هو;;Ages and nationalities | الأعمار والجنسيات;;Days and months | الأيام والشهور;;Regular -ar verbs | أفعال -ar المنتظمة;;Regular -er and -ir verbs | أفعال -er و-ir المنتظمة;;Family members | أفراد الأسرة;;tener and hay | tener وhay;;Food and ordering in a restaurant | الطعام والطلب في مطعم;;estar: place and condition | estar: المكان والحالة;;Directions and transport | الاتجاهات والمواصلات;;Daily routine and reflexive verbs | الروتين اليومي والأفعال العاكسة;;Near future: ir a + infinitive | المستقبل القريب: ir a + مصدر;;Simple past (intro) | الماضي البسيط (مدخل)'],
+['de','lang','lang',4,30,'evening','German (from zero) | الألماني (من الصفر)',
+ 'Alphabet and pronunciation | الحروف والنطق;;Greetings and introductions | التحيات والتعارف;;Numbers and the clock | الأرقام والساعة;;Articles der/die/das | أدوات التعريف;;Present tense of regular verbs | المضارع للأفعال المنتظمة;;sein and haben | sein وhaben;;Food, drinks and shopping | الطعام والمشروبات والتسوق;;Word order in sentences | ترتيب الكلمات في الجملة;;Accusative case | حالة المفعول به;;Daily routine | الروتين اليومي;;Modal verbs | الأفعال المساعدة;;Directions and transport | الاتجاهات والمواصلات'],
+['fr','lang','lang',4,30,'evening','French (from zero) | الفرنسي (من الصفر)',
+ 'Alphabet and pronunciation | الحروف والنطق;;Greetings and introductions | التحيات والتعارف;;Numbers and the clock | الأرقام والساعة;;Articles and gender | أدوات التعريف والجنس;;être and avoir | être وavoir;;Regular -er verbs | أفعال -er المنتظمة;;Food, drinks and shopping | الطعام والمشروبات والتسوق;;Questions and negation | الأسئلة والنفي;;Daily routine | الروتين اليومي;;Directions and transport | الاتجاهات والمواصلات;;Past tense (passé composé) | الماضي المركب'],
+['qnew','quran','quran',6,35,'morning','Quran memorization | حفظ القرآن',''],
+['qread','quran','qread',6,20,'any','Quran recitation (reading) | تلاوة القرآن',''],
+['tajweed','quran','study',2,25,'any','Tajweed basics | أساسيات التجويد',
+ 'Letter articulation points (makharij) | مخارج الحروف;;Characteristics of letters | صفات الحروف;;Noon sakinah and tanween rules | أحكام النون الساكنة والتنوين;;Meem sakinah rules | أحكام الميم الساكنة;;Madd rules | أحكام المد;;Qalqalah and ghunnah | القلقلة والغنة;;Stopping and starting (waqf) | الوقف والابتداء;;Practice: record and review your recitation | تطبيق: سجّل تلاوتك وراجعها'],
+['home','health','workout',4,40,'morning','Home workout (no equipment) | تمارين منزلية بدون أدوات',''],
+['run','health','habit',3,30,'morning','Running for beginners | الجري للمبتدئين',
+ 'Walk 2 min, jog 1 min, repeat 8 times | امشِ دقيقتين واركض دقيقة، كرر ٨ مرات;;Walk 2 min, jog 2 min, repeat 6 times | امشِ دقيقتين واركض دقيقتين، كرر ٦ مرات;;Walk 1 min, jog 3 min, repeat 6 times | امشِ دقيقة واركض ٣ دقائق، كرر ٦ مرات;;Jog 5 min, walk 2 min, repeat 3 times | اركض ٥ دقائق وامشِ دقيقتين، كرر ٣ مرات;;Jog 8 min, walk 2 min, repeat 3 times | اركض ٨ دقائق وامشِ دقيقتين، كرر ٣ مرات;;Jog 12 min, walk 2 min, jog 12 min | اركض ١٢ دقيقة وامشِ دقيقتين واركض ١٢ دقيقة;;Jog 20 minutes without stopping | اركض ٢٠ دقيقة بدون توقف;;Jog 25–30 minutes at an easy pace | اركض ٢٥–٣٠ دقيقة بسرعة مريحة'],
+['mob','health','habit',3,15,'morning','Flexibility & mobility | المرونة وحركة المفاصل',
+ 'Neck, shoulders and upper back | الرقبة والكتفان وأعلى الظهر;;Hips and hamstrings | الحوض وخلف الفخذ;;Spine and lower back | العمود الفقري وأسفل الظهر;;Chest and posture reset | الصدر وضبط الوضعية;;Ankles, calves and knees | الكاحلان والسمانة والركبتان;;Full-body flow | روتين كامل للجسم'],
+['sleep','health','habit',5,15,'evening','Better sleep routine | روتين نوم أفضل',
+ 'Fix your sleep and wake times | ثبّت مواعيد النوم والاستيقاظ;;Screens off 30 minutes before bed | أطفئ الشاشات قبل النوم بـ ٣٠ دقيقة;;Prepare tomorrow: clothes, bag, task list | جهّز الغد: الملابس والحقيبة وقائمة المهام;;Cool, dark, quiet bedroom | غرفة نوم باردة ومظلمة وهادئة;;Caffeine cutoff by early afternoon | أوقف الكافيين بعد الظهر مبكرًا;;Wind-down routine: stretch and breathe | روتين الاسترخاء: تمدد وتنفس']
+];
+const WORKOUTS=[
+ {en:'Legs + cardio',ar:'رجلين + كارديو',ex:[['Squats','سكوات','15'],['Alternating lunges','لانجز بالتبادل','10 / leg'],['Sit-to-stand with a chair','الجلوس والوقوف بالكرسي','12'],['Calf raises','رفع الكعب','20'],['High knees + jumping jacks','ركبة عالية + جامبينج جاكس','40 s']]},
+ {en:'Back, posture + abs',ar:'ضهر ووضعية + بطن',ex:[['Superman','سوبرمان','12'],['Prone Y-T-W','Y-T-W على البطن','8 / shape'],['Towel pull-apart','شد المنشفة','10'],['Lying leg raises','رفع الرجلين مستلقيًا','10'],['Dead bug','Dead bug','8 / side']]},
+ {en:'Chest, shoulders + triceps',ar:'صدر وكتف وترايسبس',ex:[['Push-ups (knee or regular)','ضغط (ركب أو عادي)','8–12'],['Decline push-ups, feet on a chair','ضغط مائل بالرجلين على كرسي','8–10'],['Pike push-ups','ضغط بايك','6–10'],['Chair triceps dips','تراي ديبس على كرسي','8–12'],['Plank','بلانك','30–40 s']]},
+ {en:'Glutes, legs + core',ar:'جلوتس ورجلين وكور',ex:[['Bulgarian split squat with a chair','Bulgarian split squat بكرسي','8 / leg'],['Single-leg Romanian deadlift','Romanian deadlift برجل واحدة','10 / leg'],['Single-leg glute bridge','Glute bridge برجل واحدة','10 / leg'],['Mountain climbers','Mountain climbers','30 s'],['Side plank','بلانك جانبي','20–30 s / side']]},
+ {en:'Full-body fat-burning circuit',ar:'دايرة جسم كامل لحرق الدهون',ex:[['Squats','سكوات','15'],['Push-ups','ضغط','10'],['Superman','سوبرمان','12'],['Burpees without the jump','Burpees بدون قفز','8'],['Plank with shoulder tap','بلانك مع لمس الكتف','30 s']]}
+];
+
+const DAYS={en:['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],ar:['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت']};
+const MONTHS={en:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],ar:['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر']};
+const GAP=10;
+const pad=n=>String(n).padStart(2,'0');
+function toMin(s){const a=String(s).split(':');return (+a[0])*60+(+a[1]||0)}
+function fmtTime(min,lang){min=Math.round(min);const h=Math.floor(min/60)%24,m=min%60,am=h<12;return (h%12||12)+':'+pad(m)+' '+(lang==='ar'?(am?'ص':'م'):(am?'AM':'PM'))}
+function fmtDur(m,lang){const h=Math.floor(m/60),r=m%60;if(lang==='ar')return h?(r?h+' س '+r+' د':h+' س'):r+' د';return h?(r?h+' h '+r+' min':h+' h'):r+' min'}
+function addDays(iso,n){const d=new Date(iso+'T00:00:00Z');d.setUTCDate(d.getUTCDate()+n);return d.toISOString().slice(0,10)}
+function dow(iso){return new Date(iso+'T00:00:00Z').getUTCDay()}
+function todayISO(){const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())}
+function fmtDate(iso,lang){const d=new Date(iso+'T00:00:00Z');return d.getUTCDate()+' '+MONTHS[lang][d.getUTCMonth()]}
+function pick(o,lang){return typeof o==='string'?o:(o[lang]||o.en)}
+function splitBi(s){const a=s.split(' | ');return {en:a[0].trim(),ar:(a[1]||a[0]).trim()}}
+const LIB=RAW.map(r=>({id:r[0],sec:r[1],kind:r[2],n:r[3],m:r[4],slot:r[5],name:splitBi(r[6]),topics:r[7]?r[7].split(';;').map(splitBi):[]}));
+LIB.forEach(c=>{if(c.kind==='workout')c.topics=WORKOUTS.map(w=>({en:w.en,ar:w.ar,ex:w.ex}))});
+const LIBMAP={};LIB.forEach(c=>LIBMAP[c.id]=c);
+function defaultProfile(){return {start:addDays(todayISO(),1),weeks:12,wake:'05:00',sleep:'22:30',workDays:[0,1,2,3,4],workStart:'09:00',workEnd:'17:00',commute:45,windDown:60,restDays:[5],morningBuffer:30,offMorningEnd:'13:00',offEveningStart:'16:00'}}
+// resolve a stored subject record into a full subject
+function resolveSubject(rec){
+  const base=rec.cid?LIBMAP[rec.cid]:null;
+  const sec=base?base.sec:'custom';
+  return {id:rec.id,cid:rec.cid||null,sec,kind:base?base.kind:'study',name:base?base.name:{en:rec.name,ar:rec.name},
+    n:rec.n,m:rec.m,slot:rec.slot||(base?base.slot:'evening'),topics:base?base.topics:(rec.topics||[]).map(t=>({en:t,ar:t})),
+    review:(base?base.kind==='study'||base.kind==='lang':true),ignoreRest:(sec==='quran'),
+    startPage:rec.startPage||1,pages:rec.pages||(base&&base.kind==='quran'?2:3)};
+}
+function windowsFor(p,d,rest){
+  const wake=toMin(p.wake),sleep=toMin(p.sleep),w=[];
+  const isWork=p.workDays.includes(d)&&!rest;
+  const ms=wake+p.morningBuffer;
+  if(isWork){
+    const me=toMin(p.workStart)-p.commute-20;
+    if(me-ms>=20)w.push({k:'morning',s:ms,e:me});
+    const es=toMin(p.workEnd)+p.commute+p.windDown,ee=sleep-30;
+    if(ee-es>=20)w.push({k:'evening',s:es,e:ee});
+  }else{
+    const me=toMin(p.offMorningEnd);
+    if(me-ms>=20)w.push({k:'morning',s:ms,e:me});
+    const es=toMin(p.offEveningStart),ee=sleep-30;
+    if(ee-es>=20)w.push({k:'evening',s:es,e:ee});
+  }
+  return w.map(x=>({...x,cur:x.s}));
+}
+function weeklyCapacity(p){let t=0;for(let d=0;d<7;d++){if(p.restDays.includes(d))continue;windowsFor(p,d,false).forEach(w=>t+=w.e-w.s)}return t}
+function weeklyDemand(subs){return subs.reduce((a,s)=>a+s.n*(s.m+GAP),0)}
+function tryPlace(day,s){
+  const ws=day.wins;if(!ws.length)return false;
+  let order=s.slot==='morning'?['morning','evening']:s.slot==='evening'?['evening','morning']:null;
+  let list=order?order.map(k=>ws.find(w=>w.k===k)).filter(Boolean):ws.slice().sort((a,b)=>(b.e-b.cur)-(a.e-a.cur));
+  for(const w of list){if(w.cur+s.m<=w.e){const st=w.cur;w.cur=st+s.m+GAP;day.events.push({sid:s.id,start:st,end:st+s.m,sub:s});return true}}
+  return false;
+}
+function stepsFor(s,ev,lang){
+  const m=ev.end-ev.start,T=(en,ar,f)=>({text:lang==='ar'?ar:en,min:Math.max(1,Math.round(m*f))});
+  if(ev.review)return [T("Re-read your notes from this week's topics","أعد قراءة ملاحظاتك عن مواضيع الأسبوع",.35),T('Test yourself without looking: questions or a quick exercise','اختبر نفسك بدون النظر: أسئلة أو تمرين سريع',.45),T('Fix your mistakes and note what is still weak','صحح أخطاءك وسجّل ما زال ضعيفًا',.2)];
+  switch(s.kind){
+    case 'lang':return [T("Review yesterday's vocabulary with flashcards","راجع مفردات الأمس بالبطاقات",.2),T('Study the lesson','ادرس الدرس',.4),T('Say the sentences out loud','قل الجمل بصوت عالٍ',.2),T('Write a few sentences yourself','اكتب بعض الجمل بنفسك',.2)];
+    case 'quran':return [T('Read the pages by sight 3 times','اقرأ الصفحات نظرًا ٣ مرات',.3),T('Memorize verse by verse, then recite without looking','احفظ آية آية ثم سمّع بدون نظر',.5),T('Link the whole portion together','اربط الورد كاملًا',.2)];
+    case 'qread':return [T('Read by sight with reflection','اقرأ بالنظر بتدبر',1)];
+    case 'workout':return [T('Warm up: arm circles, hip circles, light jumping','سخّن: دوران الكتف والحوض وقفز خفيف',.12),T('Circuit: 3 rounds of the exercises below, rest 45 s between rounds','الدايرة: ٣ جولات من التمارين بالأسفل، راحة ٤٥ ثانية بين الجولات',.7),T('Cool down and stretch','تهدئة وتمدد',.18)];
+    case 'habit':return [T('Do today\'s item as written','نفّذ بند اليوم كما هو مكتوب',1)];
+    default:return [T('Read or watch the topic','اقرأ أو شاهد الموضوع',.4),T('Practice: solve exercises or apply it yourself','تدرّب: حل تمارين أو طبّقه بنفسك',.4),T('Write a 3-line summary and note your mistakes','اكتب ملخصًا من ٣ أسطر وسجّل أخطاءك',.2)];
+  }
+}
+function buildPlan(p,subjects){
+  const N=p.weeks*7,days=[];
+  for(let i=0;i<N;i++){const iso=addDays(p.start,i),d=dow(iso),rest=p.restDays.includes(d);days.push({iso,i,dow:d,week:Math.floor(i/7)+1,rest,work:p.workDays.includes(d)&&!rest,wins:windowsFor(p,d,rest),events:[]})}
+  let overflow=0;const byS={};subjects.forEach(s=>byS[s.id]=[]);
+  for(let w=0;w<p.weeks;w++){
+    const wd=days.slice(w*7,w*7+7);
+    for(const s of subjects){
+      let cands=wd.filter(d=>d.wins.length&&(s.ignoreRest||!d.rest));
+      if(!cands.length){overflow+=s.n;continue}
+      const n=Math.min(s.n,cands.length),used=new Set();
+      for(let j=0;j<n;j++){
+        const target=(j+0.5)*cands.length/n-0.5;
+        const ranked=cands.map((d,idx)=>({d,sc:d.events.reduce((a,e)=>a+e.end-e.start,0)+40*Math.abs(idx-target)})).filter(x=>!used.has(x.d)).sort((a,b)=>a.sc-b.sc);
+        let ok=false;for(const r of ranked){if(tryPlace(r.d,s)){used.add(r.d);ok=true;break}}
+        if(!ok)overflow++;
+      }
+    }
+  }
+  days.forEach(d=>d.events.sort((a,b)=>a.start-b.start));
+  // sessions per subject in order
+  subjects.forEach(s=>{
+    const list=[];days.forEach(d=>d.events.forEach(e=>{if(e.sid===s.id)list.push({d,e})}));
+    list.forEach((x,k)=>{x.e.k=k;x.e.iso=x.d.iso;x.e.week=x.d.week;x.e.key=x.d.iso+'|'+s.id+'|'+k});
+    const perWeek={};list.forEach(x=>(perWeek[x.d.week]=perWeek[x.d.week]||[]).push(x));
+    if(s.review)Object.values(perWeek).forEach(a=>{if(a.length>=3)a[a.length-1].e.review=true});
+    const normal=list.filter(x=>!x.e.review),M=s.topics.length,Nn=normal.length;
+    normal.forEach((x,k)=>{
+      if(s.kind==='quran'||s.kind==='qread'){
+        const a=s.startPage+k*s.pages,b=a+s.pages-1,wrap=v=>((v-1)%604)+1;
+        x.e.pages=[wrap(a),wrap(b)];
+        if(s.kind==='quran'&&k>0)x.e.reviewPages=[wrap(Math.max(s.startPage,a-s.pages*5)),wrap(a-1)];
+        return;
+      }
+      if(!M)return;
+      if(s.kind==='workout'||s.kind==='habit'){x.e.topics=[s.topics[k%M]];return}
+      const st=Math.floor(k*M/Nn),en=Math.floor((k+1)*M/Nn);
+      if(en>st)x.e.topics=s.topics.slice(st,en);
+      else{x.e.topics=[s.topics[Math.min(st,M-1)]];x.e._st=st}
+    });
+    const grp={};normal.forEach(x=>{if(x.e._st!==undefined)(grp[x.e._st]=grp[x.e._st]||[]).push(x.e)});
+    Object.values(grp).forEach(a=>{if(a.length>1)a.forEach((e,i)=>e.part=[i+1,a.length])});
+  });
+  return {days,overflow};
+}
+function parseTopics(text){
+  const out=[];
+  for(let ln of String(text).split(/\r?\n/)){
+    let t=ln.replace(/\*\*|__|`/g,'').trim();
+    for(let i=0;i<3;i++)t=t.replace(/^\s*(?:[-*•▪●–]|#+|\d+\s*[.)\-:–]|week\s*\d+\s*[:\-–]|الأسبوع\s*\d+\s*[:\-–]|[٠-٩]+\s*[.)\-:–])\s*/i,'');
+    t=t.trim();
+    if(t.length<2)continue;
+    if(/^(here|sure|of course|certainly|below)\b/i.test(t)&&/:$/.test(t))continue;
+    out.push(t.slice(0,160));
+  }
+  return out;
+}
+function buildPrompt(o){
+  const N=o.n*o.weeks,L=o.lang==='ar'?'Arabic':'English';
+  return 'I want to learn: '+o.goal+'. I can study '+o.n+' sessions per week, '+o.m+' minutes each, for '+o.weeks+' weeks (about '+N+' sessions). Build me a study curriculum as a numbered list of '+N+' topics or fewer, in a logical order from beginner to advanced. Output ONLY the numbered list: one topic per line, a short title of at most 10 words, no explanations, no headings, no extra text. Reply in '+L+'.';
+}
+if(false)module.exports={buildPlan,defaultProfile,resolveSubject,LIB,parseTopics,buildPrompt,weeklyCapacity,weeklyDemand,addDays,dow,fmtTime,windowsFor};
+
+const T={en:{
+app:'Plan Builder',today:'Today',plan:'Plan',progress:'Progress',setup:'Setup',
+dayOf:'Day {i} of {n} · Week {w}',notStarted:'Your plan starts on {d}. Come back then, or browse the plan.',ended:'This day is after the end of your plan.',
+noEvents:'Nothing scheduled for this day.',restDay:'Rest day',work:'Work',commute:'including commute',details:'Details',
+done:'Done',no:'Not done',half:'Partial',dayDone:'{a} of {b} done',review:'Weekly review & practice',session:'Session {k}',part:'part {i} of {n}',
+memorize:'Memorize pages {a}–{b}',readp:'Read pages {a}–{b}',revPages:'Review pages {a}–{b} (last sessions)',exTitle:'Exercises',
+rate:'Commitment',doneAll:'Activities done',streak:'Day streak',daysLeft:'Days left',byWeek:'By week',bySubject:'By subject',elapsedNote:'Counted from activities scheduled up to today.',
+week:'Week {w}',open:'Open',acts:'{a}/{b}',
+s_title:'Build your plan',s_intro:'Tell the app your schedule and what you want to learn. It places every activity at a real time of day, around work and sleep.',
+s_sched:'1. Your schedule',startDate:'Start date',weeks:'Weeks',wake:'Wake up',sleepT:'Sleep',workDays:'Work days',workStart:'Work starts',workEnd:'Work ends',commuteL:'Commute, one way (min)',windL:'Rest after getting home (min)',restDays:'Rest days (no study)',
+s_subj:'2. What do you want to work on?',perWeek:'sessions / week',mins:'minutes',startPage:'Start page',pagesPer:'Pages per session',
+cap:'Weekly time check',capLine:'You asked for {d} of activities. Your schedule has about {c} free.',capOk:'This fits your week.',capTight:'This is tight. Remove a subject or shorten sessions.',capOver:'This does not fit. Remove a subject or shorten sessions.',
+many:'You picked {n} learning subjects. Most working people keep to 2–3 at a time.',
+build:'Build my plan',rebuild:'Rebuild my plan',needOne:'Pick at least one subject.',built:'Plan ready.',
+c_title:'Add another subject',c_intro:'Type what you want to learn. Get a curriculum from an AI tool, paste it here, and it becomes part of your plan.',
+c_name:'Subject name',c_goal:'What do you want to learn, and why?',c_goalPh:'e.g. UI design for web apps, beginner, to build my own app',mkPrompt:'Create the AI request',
+c_step2:'Open an AI tool. Your request is copied for you; paste it into the chat if it does not appear.',openGPT:'Open ChatGPT',openGem:'Open Gemini',openClaude:'Open Claude',copyP:'Copy request',copied:'Copied.',
+c_step3:'Paste the answer here',pasteBtn:'Paste',pasteBlocked:'Your browser blocked the paste button. Tap in the box, then paste with a long press or Ctrl+V.',
+topicsFound:'{n} topics found',noTopics:'No topics found yet.',addSubj:'Add to my plan',remove:'Remove',custom:'Custom',
+backup:'Backup',copyBackup:'Copy my data',restore:'Restore from backup',restoreBtn:'Restore',badBackup:'That backup could not be read.',restored:'Restored.',backupNote:'Your marks and plan are saved on this device only. Copy your data to move it to another device.',
+lang:'العربية',reset:'Start over',resetAsk:'Delete everything and start over?',yes:'Yes, delete',cancel:'Cancel',
+pickSlot:'Time of day',morning:'Morning',evening:'Evening',anySlot:'Any',overflow:'{n} sessions did not fit and were skipped. Shorten sessions or remove a subject.',
+beforeStart:'Starts {d}'},
+ar:{
+app:'منظّم الخطة',today:'اليوم',plan:'الخطة',progress:'التقدّم',setup:'الإعداد',
+dayOf:'اليوم {i} من {n} · الأسبوع {w}',notStarted:'خطتك تبدأ يوم {d}. ارجع وقتها، أو تصفّح الخطة.',ended:'هذا اليوم بعد نهاية خطتك.',
+noEvents:'مفيش حاجة مجدولة النهاردة.',restDay:'يوم راحة',work:'الشغل',commute:'شامل المواصلات',details:'التفاصيل',
+done:'تم',no:'لم يتم',half:'جزئي',dayDone:'تم {a} من {b}',review:'مراجعة الأسبوع وتمارين',session:'الجلسة {k}',part:'جزء {i} من {n}',
+memorize:'احفظ الصفحات {a}–{b}',readp:'اقرأ الصفحات {a}–{b}',revPages:'راجع الصفحات {a}–{b} (آخر الجلسات)',exTitle:'التمارين',
+rate:'نسبة الالتزام',doneAll:'أنشطة تمت',streak:'أيام متتالية',daysLeft:'الأيام المتبقية',byWeek:'حسب الأسبوع',bySubject:'حسب المادة',elapsedNote:'محسوبة من الأنشطة المجدولة حتى اليوم.',
+week:'الأسبوع {w}',open:'فتح',acts:'{a}/{b}',
+s_title:'ابنِ خطتك',s_intro:'اكتب مواعيدك وإيه اللي عايز تتعلمه. التطبيق بيحط كل نشاط في وقت فعلي من اليوم حوالين الشغل والنوم.',
+s_sched:'١. مواعيدك',startDate:'تاريخ البداية',weeks:'عدد الأسابيع',wake:'الاستيقاظ',sleepT:'النوم',workDays:'أيام الشغل',workStart:'بداية الشغل',workEnd:'نهاية الشغل',commuteL:'المواصلات، مشوار واحد (د)',windL:'راحة بعد الوصول للبيت (د)',restDays:'أيام الراحة (بدون مذاكرة)',
+s_subj:'٢. عايز تشتغل على إيه؟',perWeek:'جلسات / أسبوع',mins:'دقيقة',startPage:'صفحة البداية',pagesPer:'صفحات كل جلسة',
+cap:'مراجعة وقت الأسبوع',capLine:'طلبت {d} من الأنشطة. جدولك فيه حوالي {c} فاضية.',capOk:'ده مناسب لأسبوعك.',capTight:'الوقت ضيق. شيل مادة أو قصّر الجلسات.',capOver:'ده مش هيتحمل. شيل مادة أو قصّر الجلسات.',
+many:'اخترت {n} مواد تعلّم. أغلب الشغالين بيكتفوا بـ ٢–٣ مواد في نفس الوقت.',
+build:'ابنِ خطتي',rebuild:'أعد بناء خطتي',needOne:'اختر مادة واحدة على الأقل.',built:'الخطة جاهزة.',
+c_title:'أضف مادة أخرى',c_intro:'اكتب اللي عايز تتعلمه. هات المنهج من أداة ذكاء اصطناعي، والصقه هنا، ويبقى جزء من خطتك.',
+c_name:'اسم المادة',c_goal:'عايز تتعلم إيه، وليه؟',c_goalPh:'مثلًا: تصميم واجهات المواقع، مبتدئ، عشان أعمل تطبيقي',mkPrompt:'اعمل طلب الذكاء الاصطناعي',
+c_step2:'افتح أداة ذكاء اصطناعي. الطلب بيتنسخ لك؛ الصقه في المحادثة لو ما ظهرش لوحده.',openGPT:'افتح ChatGPT',openGem:'افتح Gemini',openClaude:'افتح Claude',copyP:'انسخ الطلب',copied:'اتنسخ.',
+c_step3:'الصق الرد هنا',pasteBtn:'الصق',pasteBlocked:'المتصفح منع زرار اللصق. اضغط داخل الخانة والصق بالضغط المطوّل أو Ctrl+V.',
+topicsFound:'تم العثور على {n} موضوع',noTopics:'لا توجد مواضيع بعد.',addSubj:'أضفها لخطتي',remove:'حذف',custom:'مخصصة',
+backup:'نسخة احتياطية',copyBackup:'انسخ بياناتي',restore:'استرجاع من نسخة',restoreBtn:'استرجع',badBackup:'تعذّرت قراءة النسخة.',restored:'تم الاسترجاع.',backupNote:'علاماتك وخطتك محفوظة على هذا الجهاز فقط. انسخ بياناتك لتنقلها لجهاز آخر.',
+lang:'English',reset:'ابدأ من جديد',resetAsk:'حذف كل شيء والبدء من جديد؟',yes:'نعم، احذف',cancel:'إلغاء',
+pickSlot:'وقت اليوم',morning:'صباحًا',evening:'مساءً',anySlot:'أي وقت',overflow:'{n} جلسة لم تتسع وتم تخطيها. قصّر الجلسات أو احذف مادة.',
+beforeStart:'تبدأ {d}'}};
+let S=load(),view=S.built?'today':'setup',selDate=null,toastT=null;
+const OPEN=new Set();
+let draft={name:'',goal:'',n:3,m:30,prompt:'',paste:''};
+function guessLang(){try{return (navigator.language||'en').toLowerCase().startsWith('ar')?'ar':'en'}catch(e){return 'en'}}
+function load(){try{const j=JSON.parse(localStorage.getItem('planner.v1'));if(j&&j.v===1&&j.profile)return j}catch(e){}return {v:1,lang:guessLang(),profile:defaultProfile(),subjects:[],status:{},built:false}}
+function save(){try{localStorage.setItem('planner.v1',JSON.stringify(S))}catch(e){}}
+function t(k,v){let s=(T[S.lang]&&T[S.lang][k])||T.en[k]||k;if(v)for(const x in v)s=s.split('{'+x+'}').join(v[x]);return s}
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const secOf=id=>SECTIONS.find(x=>x.id===id)||SECTIONS[7];
+function getPlan(){const subs=S.subjects.map(resolveSubject);return {subs,...buildPlan(S.profile,subs)}}
+function toast(m){const el=document.getElementById('toast');el.textContent=m;el.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('on'),3200)}
+function copyText(txt){try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).catch(()=>{})}}catch(e){}}
+function evTitle(e){
+  const L=S.lang,s=e.sub;
+  if(e.review)return t('review');
+  if(e.pages){const a=e.pages[0],b=e.pages[1];return t(s.kind==='quran'?'memorize':'readp',{a,b})}
+  if(e.topics){let x=e.topics.map(o=>pick(o,L)).join(' + ');if(e.part)x+=' ('+t('part',{i:e.part[0],n:e.part[1]})+')';return x}
+  return t('session',{k:e.k+1});
+}
+function ytLink(name){return 'https://www.youtube.com/results?search_query='+encodeURIComponent(name+' exercise form')}
+function evDetails(e){
+  const L=S.lang,s=e.sub;let h='';
+  if(e.reviewPages)h+='<p class="note">'+esc(t('revPages',{a:e.reviewPages[0],b:e.reviewPages[1]}))+'</p>';
+  const steps=stepsFor(s,e,L);
+  h+='<ol class="steps">'+steps.map(x=>'<li>'+esc(x.text)+' <span class="mn">'+fmtDur(x.min,L)+'</span></li>').join('')+'</ol>';
+  if(s.kind==='workout'&&e.topics&&e.topics[0].ex){
+    h+='<p class="sub">'+esc(t('exTitle'))+'</p><ul class="ex">'+e.topics[0].ex.map(x=>'<li><span>'+esc(L==='ar'?x[1]:x[0])+'</span><b>'+esc(x[2])+'</b><a href="'+ytLink(x[0])+'" target="_blank" rel="noopener" aria-label="video">▶</a></li>').join('')+'</ul>';
+  }else if(e.topics&&e.topics.length>1){h+='<ul class="tl">'+e.topics.map(o=>'<li>'+esc(pick(o,L))+'</li>').join('')+'</ul>'}
+  return h;
+}
+function evCard(e){
+  const L=S.lang,sec=secOf(e.sub.sec),st=S.status[e.key]||'',dur=e.end-e.start;
+  const mk=(v,lab,sym)=>'<button class="mk mk-'+v+'" data-act="mark" data-k="'+esc(e.key)+'" data-v="'+v+'" aria-pressed="'+(st===v)+'" aria-label="'+esc(lab)+'" title="'+esc(lab)+'">'+sym+'</button>';
+  return '<article class="ev'+(st?' st-'+st:'')+'" style="--sc:'+sec.color+'"><div class="tm"><b>'+fmtTime(e.start,L)+'</b><span>'+fmtTime(e.end,L)+'</span><i>'+fmtDur(dur,L)+'</i></div><div class="bd"><div class="sn">'+esc(pick(e.sub.name,L))+'</div><div class="tt">'+esc(evTitle(e))+'</div><details><summary>'+t('details')+'</summary>'+evDetails(e)+'</details></div><div class="mks">'+mk('d',t('done'),'✔')+mk('h',t('half'),'½')+mk('n',t('no'),'✘')+'</div></article>';
+}
+function vToday(P){
+  const L=S.lang,today=todayISO(),first=P.days[0].iso,last=P.days[P.days.length-1].iso;
+  if(!selDate)selDate=today<first?first:today>last?last:today;
+  const day=P.days.find(d=>d.iso===selDate);
+  let h='<div class="daynav"><button data-act="day" data-d="-1" aria-label="prev">‹</button><div><h2>'+DAYS[L][dow(selDate)]+' · '+fmtDate(selDate,L)+'</h2>';
+  h+='<p>'+(day?t('dayOf',{i:day.i+1,n:P.days.length,w:day.week}):t('ended'))+'</p></div><button data-act="day" data-d="1" aria-label="next">›</button></div>';
+  if(selDate!==today)h+='<button class="link" data-act="gotoday">'+t('today')+'</button>';
+  if(today<first)h+='<p class="banner">'+t('notStarted',{d:fmtDate(first,L)})+'</p>';
+  if(day){
+    const evs=day.events,dn=evs.filter(e=>S.status[e.key]==='d').length;
+    if(evs.length)h+='<div class="dprog"><div class="bar"><i style="width:'+Math.round(dn/evs.length*100)+'%"></i></div><span>'+t('dayDone',{a:dn,b:evs.length})+'</span></div>';
+    if(day.work)h+='<div class="work">'+t('work')+' · '+fmtTime(toMin(S.profile.workStart),L)+' – '+fmtTime(toMin(S.profile.workEnd),L)+' ('+t('commute')+')</div>';
+    if(day.rest)h+='<div class="work">'+t('restDay')+'</div>';
+    if(!evs.length)h+='<p class="empty">'+t('noEvents')+'</p>';
+    h+=evs.map(evCard).join('');
+  }
+  return h;
+}
+function vPlan(P){
+  const L=S.lang,today=todayISO();let h='';
+  const curW=(P.days.find(d=>d.iso===today)||{week:1}).week;
+  if(!window._pw)window._pw=curW;
+  h+='<div class="chips">'+Array.from({length:S.profile.weeks},(_,i)=>'<button class="chip'+(window._pw===i+1?' on':'')+'" data-act="pw" data-w="'+(i+1)+'">'+(i+1)+'</button>').join('')+'</div>';
+  h+='<h2 class="wk">'+t('week',{w:window._pw})+'</h2>';
+  h+=P.days.filter(d=>d.week===window._pw).map(d=>{
+    const dn=d.events.filter(e=>S.status[e.key]==='d').length;
+    const subs=[...new Set(d.events.map(e=>e.sub.id))].map(id=>{const s=P.subs.find(x=>x.id===id);return '<i style="background:'+secOf(s.sec).color+'" title="'+esc(pick(s.name,L))+'"></i>'}).join('');
+    return '<button class="prow'+(d.iso===today?' now':'')+'" data-act="openday" data-d="'+d.iso+'"><span class="pd"><b>'+DAYS[L][d.dow]+'</b><small>'+fmtDate(d.iso,L)+'</small></span><span class="dots">'+subs+'</span><span class="pc">'+(d.rest&&!d.events.length?t('restDay'):t('acts',{a:dn,b:d.events.length}))+'</span></button>';
+  }).join('');
+  return h;
+}
+function vProgress(P){
+  const L=S.lang,today=todayISO();
+  const all=[];P.days.forEach(d=>d.events.forEach(e=>all.push(e)));
+  const el=all.filter(e=>e.iso<=today),dn=el.filter(e=>S.status[e.key]==='d').length;
+  const rate=el.length?Math.round(dn/el.length*100):0;
+  let streak=0;{let i=P.days.findIndex(d=>d.iso===today);if(i<0)i=today>P.days[P.days.length-1].iso?P.days.length-1:-1;
+    if(i>=0){const has=d=>d.events.some(e=>S.status[e.key]==='d');if(!has(P.days[i]))i--;while(i>=0&&has(P.days[i])){streak++;i--}}}
+  const left=Math.max(0,Math.round((new Date(P.days[P.days.length-1].iso)-new Date(today))/864e5));
+  let h='<div class="tiles"><div><b>'+rate+'%</b><span>'+t('rate')+'</span></div><div><b>'+dn+'</b><span>'+t('doneAll')+'</span></div><div><b>'+streak+'</b><span>'+t('streak')+'</span></div><div><b>'+left+'</b><span>'+t('daysLeft')+'</span></div></div><p class="note">'+t('elapsedNote')+'</p>';
+  h+='<h3>'+t('byWeek')+'</h3><div class="wbars">';
+  for(let w=1;w<=S.profile.weeks;w++){const ev=all.filter(e=>e.week===w&&e.iso<=today),d=ev.filter(e=>S.status[e.key]==='d').length,p=ev.length?Math.round(d/ev.length*100):0;
+    h+='<div class="wb" title="'+p+'%"><div><i style="height:'+p+'%"></i></div><small>'+w+'</small></div>'}
+  h+='</div><h3>'+t('bySubject')+'</h3>';
+  h+=P.subs.map(s=>{const ev=el.filter(e=>e.sid===s.id),d=ev.filter(e=>S.status[e.key]==='d').length,p=ev.length?Math.round(d/ev.length*100):0;
+    return '<div class="srow" style="--sc:'+secOf(s.sec).color+'"><span>'+esc(pick(s.name,L))+'</span><div class="bar"><i style="width:'+p+'%"></i></div><b>'+d+'/'+ev.length+'</b></div>'}).join('');
+  return h;
+}
+const DUR=[15,20,30,40,45,60,90];
+function selHtml(opts,val,attrs,lab){return '<select '+attrs+' aria-label="'+esc(lab)+'">'+opts.map(o=>'<option value="'+o[0]+'"'+(String(o[0])===String(val)?' selected':'')+'>'+o[1]+'</option>').join('')+'</select>'}
+function vSetup(){
+  const L=S.lang,p=S.profile;
+  const dayCbs=(name,arr)=>'<div class="dcb">'+[0,1,2,3,4,5,6].map(d=>'<label><input type="checkbox" data-f="'+name+'" value="'+d+'"'+(arr.includes(d)?' checked':'')+'><span>'+DAYS[L][d].slice(0,L==='ar'?3:3)+'</span></label>').join('')+'</div>';
+  let h='<h2>'+t('s_title')+'</h2><p class="lead">'+t('s_intro')+'</p>';
+  h+='<section class="card"><h3>'+t('s_sched')+'</h3><div class="grid">';
+  h+='<label>'+t('startDate')+'<input type="date" data-f="start" value="'+p.start+'"></label>';
+  h+='<label>'+t('weeks')+'<input type="number" min="4" max="26" data-f="weeks" value="'+p.weeks+'"></label>';
+  h+='<label>'+t('wake')+'<input type="time" data-f="wake" value="'+p.wake+'"></label>';
+  h+='<label>'+t('sleepT')+'<input type="time" data-f="sleep" value="'+p.sleep+'"></label>';
+  h+='<label>'+t('workStart')+'<input type="time" data-f="workStart" value="'+p.workStart+'"></label>';
+  h+='<label>'+t('workEnd')+'<input type="time" data-f="workEnd" value="'+p.workEnd+'"></label>';
+  h+='<label>'+t('commuteL')+'<input type="number" min="0" max="180" step="5" data-f="commute" value="'+p.commute+'"></label>';
+  h+='<label>'+t('windL')+'<input type="number" min="0" max="240" step="5" data-f="windDown" value="'+p.windDown+'"></label></div>';
+  h+='<p class="fl">'+t('workDays')+'</p>'+dayCbs('workDays',p.workDays)+'<p class="fl">'+t('restDays')+'</p>'+dayCbs('restDays',p.restDays)+'</section>';
+  h+='<section class="card"><h3>'+t('s_subj')+'</h3>';
+  SECTIONS.forEach((sec,si)=>{
+    const courses=LIB.filter(c=>c.sec===sec.id),customs=S.subjects.filter(r=>!r.cid&&sec.id==='custom');
+    if(!courses.length&&!customs.length)return;
+    const nsel=S.subjects.filter(r=>r.cid&&LIBMAP[r.cid].sec===sec.id).length+customs.length;
+    h+='<details class="sec" data-sid="'+sec.id+'"'+(OPEN.has(sec.id)||(!OPEN.touched&&(si===0||nsel))?' open':'')+' style="--sc:'+sec.color+'"><summary>'+esc(pick(sec,L))+(nsel?' <em>'+nsel+'</em>':'')+'</summary>';
+    courses.forEach(c=>{
+      const rec=S.subjects.find(r=>r.cid===c.id);
+      h+='<div class="crs'+(rec?' on':'')+'"><label class="ck"><input type="checkbox" data-act="subj" data-c="'+c.id+'"'+(rec?' checked':'')+'><span>'+esc(pick(c.name,L))+'</span></label>';
+      if(rec){
+        h+='<div class="ctl">'+selHtml([1,2,3,4,5,6,7].map(n=>[n,n+' × '+t('perWeek')]),rec.n,'data-act="rn" data-id="'+rec.id+'"',t('perWeek'))+selHtml(DUR.map(m=>[m,m+' '+t('mins')]),rec.m,'data-act="rm" data-id="'+rec.id+'"',t('mins'))+selHtml([['morning',t('morning')],['evening',t('evening')],['any',t('anySlot')]],rec.slot||c.slot,'data-act="rs" data-id="'+rec.id+'"',t('pickSlot'));
+        if(c.kind==='quran'||c.kind==='qread')h+='<label class="mini">'+t('startPage')+'<input type="number" min="1" max="604" data-act="sp" data-id="'+rec.id+'" value="'+(rec.startPage||1)+'"></label><label class="mini">'+t('pagesPer')+'<input type="number" min="1" max="20" data-act="pg" data-id="'+rec.id+'" value="'+(rec.pages||(c.kind==='quran'?2:3))+'"></label>';
+        h+='</div>';
+      }
+      h+='</div>';
+    });
+    customs.forEach(r=>{
+      h+='<div class="crs on"><div class="ck"><span>'+esc(r.name)+' <em>'+t('custom')+' · '+r.topics.length+'</em></span><button class="link" data-act="rmc" data-id="'+r.id+'">'+t('remove')+'</button></div><div class="ctl">'+selHtml([1,2,3,4,5,6,7].map(n=>[n,n+' × '+t('perWeek')]),r.n,'data-act="rn" data-id="'+r.id+'"',t('perWeek'))+selHtml(DUR.map(m=>[m,m+' '+t('mins')]),r.m,'data-act="rm" data-id="'+r.id+'"',t('mins'))+'</div></div>';
+    });
+    h+='</details>';
+  });
+  h+='</section>'+customPanel();
+  h+=capBlock();
+  h+='<button class="primary" data-act="build"'+(S.subjects.length?'':' disabled')+'>'+(S.built?t('rebuild'):t('build'))+'</button>';
+  h+='<section class="card"><h3>'+t('backup')+'</h3><p class="note">'+t('backupNote')+'</p><div class="row"><button class="ghost" data-act="copybackup">'+t('copyBackup')+'</button></div><label class="fl2">'+t('restore')+'<textarea id="bk" rows="3"></textarea></label><div class="row"><button class="ghost" data-act="restore">'+t('restoreBtn')+'</button><button class="ghost danger" data-act="reset">'+t('reset')+'</button></div></section>';
+  return h;
+}
+function capBlock(){
+  const subs=S.subjects.map(resolveSubject),d=weeklyDemand(subs),c=weeklyCapacity(S.profile),r=c?d/c:9;
+  const learn=subs.filter(s=>s.kind==='study'||s.kind==='lang').length;
+  const cls=r>1?'bad':r>.8?'warn':'ok',msg=r>1?t('capOver'):r>.8?t('capTight'):t('capOk');
+  return '<section class="card cap '+cls+'"><h3>'+t('cap')+'</h3><div class="bar"><i style="width:'+Math.min(100,Math.round(r*100))+'%"></i></div><p>'+t('capLine',{d:fmtDur(d,S.lang),c:fmtDur(c,S.lang)})+' <b>'+msg+'</b></p>'+(learn>3?'<p class="note">'+t('many',{n:learn})+'</p>':'')+'</section>';
+}
+function customPanel(){
+  const L=S.lang,topics=parseTopics(draft.paste);
+  const link=(u,l,cls)=>'<a class="btn '+cls+'" href="'+u+'" target="_blank" rel="noopener" data-act="copyprompt">'+l+'</a>';
+  let h='<section class="card" id="cpanel"><h3>'+t('c_title')+'</h3><p class="note">'+t('c_intro')+'</p>';
+  h+='<label class="fl2">'+t('c_name')+'<input type="text" id="d_name" value="'+esc(draft.name)+'"></label>';
+  h+='<label class="fl2">'+t('c_goal')+'<textarea id="d_goal" rows="2" placeholder="'+esc(t('c_goalPh'))+'">'+esc(draft.goal)+'</textarea></label>';
+  h+='<div class="grid"><label>'+t('perWeek')+'<select id="d_n">'+[1,2,3,4,5,6,7].map(n=>'<option'+(n===draft.n?' selected':'')+'>'+n+'</option>').join('')+'</select></label><label>'+t('mins')+'<select id="d_m">'+DUR.map(m=>'<option'+(m===draft.m?' selected':'')+'>'+m+'</option>').join('')+'</select></label></div>';
+  h+='<button class="ghost" data-act="mkprompt">'+t('mkPrompt')+'</button>';
+  if(draft.prompt){
+    const q=encodeURIComponent(draft.prompt);
+    h+='<p class="note">'+t('c_step2')+'</p><textarea id="d_prompt" rows="4" readonly>'+esc(draft.prompt)+'</textarea><div class="row wrap">'+link('https://chatgpt.com/?q='+q,t('openGPT'),'')+link('https://claude.ai/new?q='+q,t('openClaude'),'')+link('https://gemini.google.com/app',t('openGem'),'')+'<button class="ghost" data-act="copyprompt2">'+t('copyP')+'</button></div>';
+  }
+  h+='<label class="fl2">'+t('c_step3')+'<textarea id="d_paste" rows="6">'+esc(draft.paste)+'</textarea></label><div class="row"><button class="ghost" data-act="paste">'+t('pasteBtn')+'</button><span id="d_cnt" class="note">'+(topics.length?t('topicsFound',{n:topics.length}):t('noTopics'))+'</span></div>';
+  h+='<button class="primary sm" data-act="addcustom">'+t('addSubj')+'</button></section>';
+  return h;
+}
+function render(){
+  document.documentElement.lang=S.lang;document.documentElement.dir=S.lang==='ar'?'rtl':'ltr';
+  document.title=t('app');
+  const keep=window.scrollY;let body='',P=null;
+  if(view!=='setup'&&S.built){P=getPlan();body=view==='today'?vToday(P):view==='plan'?vPlan(P):vProgress(P);if(P.overflow&&view==='today')body='<p class="banner">'+t('overflow',{n:P.overflow})+'</p>'+body}
+  else{view='setup';body=vSetup()}
+  document.getElementById('app').innerHTML=body;
+  document.getElementById('langbtn').textContent=t('lang');
+  document.getElementById('ttl').textContent=t('app');
+  document.querySelectorAll('#nav button').forEach(b=>{const v=b.dataset.v;b.querySelector('span').textContent=t(v);b.classList.toggle('on',v===view);b.disabled=!S.built&&v!=='setup'});
+  window.scrollTo(0,keep);
+}
+function updatePreview(){const n=parseTopics(draft.paste).length,el=document.getElementById('d_cnt');if(el)el.textContent=n?t('topicsFound',{n}):t('noTopics')}
+document.addEventListener('input',e=>{
+  const el=e.target;
+  if(el.id==='d_name')draft.name=el.value;else if(el.id==='d_goal')draft.goal=el.value;else if(el.id==='d_paste'){draft.paste=el.value;updatePreview()}
+});
+document.addEventListener('change',e=>{
+  const el=e.target,f=el.dataset.f,a=el.dataset.act,p=S.profile;
+  if(el.id==='d_n'){draft.n=+el.value;return}if(el.id==='d_m'){draft.m=+el.value;return}
+  if(f){
+    if(f==='workDays'||f==='restDays'){p[f]=[...document.querySelectorAll('[data-f="'+f+'"]:checked')].map(x=>+x.value)}
+    else if(f==='weeks'||f==='commute'||f==='windDown'){p[f]=Math.max(0,+el.value||0);if(f==='weeks')p.weeks=Math.min(26,Math.max(4,p.weeks))}
+    else if(el.value)p[f]=el.value;
+    save();render();return;
+  }
+  const rec=S.subjects.find(r=>r.id===el.dataset.id);
+  if(a==='subj'){
+    const c=LIBMAP[el.dataset.c];
+    if(el.checked)S.subjects.push({id:c.id,cid:c.id,n:c.n,m:c.m,slot:c.slot,startPage:1,pages:c.kind==='quran'?2:3});
+    else S.subjects=S.subjects.filter(r=>r.cid!==c.id);
+    save();render();return;
+  }
+  if(!rec)return;
+  if(a==='rn')rec.n=+el.value;else if(a==='rm')rec.m=+el.value;else if(a==='rs')rec.slot=el.value;
+  else if(a==='sp')rec.startPage=Math.min(604,Math.max(1,+el.value||1));else if(a==='pg')rec.pages=Math.min(20,Math.max(1,+el.value||1));
+  save();render();
+});
+document.addEventListener('click',async e=>{
+  const b=e.target.closest('[data-act]');if(!b||b.tagName==='INPUT'||b.tagName==='SELECT')return;
+  const a=b.dataset.act;
+  if(a==='mark'){const k=b.dataset.k,v=b.dataset.v;if(S.status[k]===v)delete S.status[k];else S.status[k]=v;save();render()}
+  else if(a==='day'){selDate=addDays(selDate,+b.dataset.d);render()}
+  else if(a==='gotoday'){selDate=null;render()}
+  else if(a==='pw'){window._pw=+b.dataset.w;render()}
+  else if(a==='openday'){selDate=b.dataset.d;view='today';render();window.scrollTo(0,0)}
+  else if(a==='rmc'){S.subjects=S.subjects.filter(r=>r.id!==b.dataset.id);save();render()}
+  else if(a==='mkprompt'){
+    const goal=(draft.goal||draft.name).trim();if(!goal){document.getElementById('d_goal').focus();return}
+    draft.prompt=buildPrompt({goal,n:draft.n,m:draft.m,weeks:S.profile.weeks,lang:S.lang});render();
+    const el=document.getElementById('cpanel');if(el)el.scrollIntoView({block:'start'});
+  }
+  else if(a==='copyprompt'){copyText(draft.prompt);toast(t('copied'))}
+  else if(a==='copyprompt2'){copyText(draft.prompt);toast(t('copied'))}
+  else if(a==='paste'){
+    let ok=false;
+    try{const tx=await navigator.clipboard.readText();if(tx){draft.paste=tx;ok=true}}catch(err){}
+    if(ok){render();const ta=document.getElementById('d_paste');if(ta)ta.scrollIntoView({block:'center'})}
+    else{toast(t('pasteBlocked'));const ta=document.getElementById('d_paste');if(ta)ta.focus()}
+  }
+  else if(a==='addcustom'){
+    const topics=parseTopics(draft.paste),name=(draft.name||draft.goal).trim().slice(0,60);
+    if(!name){document.getElementById('d_name').focus();return}
+    if(!topics.length){toast(t('noTopics'));return}
+    S.subjects.push({id:'u'+Date.now(),cid:null,name,n:draft.n,m:draft.m,slot:'evening',topics});
+    draft={name:'',goal:'',n:3,m:30,prompt:'',paste:''};save();render();
+  }
+  else if(a==='build'){if(!S.subjects.length){toast(t('needOne'));return}S.built=true;view='today';selDate=null;save();render();window.scrollTo(0,0);toast(t('built'))}
+  else if(a==='copybackup'){copyText(JSON.stringify(S));toast(t('copied'))}
+  else if(a==='restore'){
+    try{const j=JSON.parse(document.getElementById('bk').value);if(!j||j.v!==1||!j.profile)throw 0;S=j;save();view=S.built?'today':'setup';selDate=null;render();toast(t('restored'))}catch(err){toast(t('badBackup'))}
+  }
+  else if(a==='reset'){
+    const bar=document.getElementById('confirm');bar.innerHTML='<p>'+t('resetAsk')+'</p><div class="row"><button class="ghost danger" data-act="reset2">'+t('yes')+'</button><button class="ghost" data-act="cancel">'+t('cancel')+'</button></div>';bar.classList.add('on');
+  }
+  else if(a==='reset2'){const l=S.lang;S={v:1,lang:l,profile:defaultProfile(),subjects:[],status:{},built:false};save();view='setup';document.getElementById('confirm').classList.remove('on');render()}
+  else if(a==='cancel'){document.getElementById('confirm').classList.remove('on')}
+});
+document.addEventListener('toggle',e=>{const d=e.target;if(d.classList&&d.classList.contains('sec')){OPEN.touched=true;document.querySelectorAll('details.sec').forEach(x=>{if(x.open)OPEN.add(x.dataset.sid);else OPEN.delete(x.dataset.sid)})}},true);
+document.getElementById('langbtn').addEventListener('click',()=>{S.lang=S.lang==='ar'?'en':'ar';save();render()});
+document.querySelectorAll('#nav button').forEach(b=>b.addEventListener('click',()=>{if(b.disabled)return;view=b.dataset.v;if(view==='today')selDate=null;render();window.scrollTo(0,0)}));
+render();
+
+</script></body></html>
