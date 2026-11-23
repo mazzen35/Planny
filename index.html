@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Plan Builder</title>
+<title>Planny</title>
+<meta name="theme-color" content="#0f766e"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Planny">
+<link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=IBM+Plex+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
 <style>/* Layout idea: a single phone-width column with a bottom tab bar; wide screens center it at 720px. */
@@ -78,10 +80,55 @@ nav{position:fixed;inset-inline:0;bottom:0;background:var(--card);border-top:1px
 #confirm{position:fixed;inset-inline:16px;bottom:96px;max-width:520px;margin:0 auto;background:var(--card);border:1px solid var(--bad);padding:14px;border-radius:12px;display:none;z-index:9}#confirm.on{display:block}#confirm p{margin:0 0 10px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 @media (max-width:420px){.ev{grid-template-columns:72px 1fr auto;padding:10px}.pd{min-width:90px}}
+/* --- Planny additions --- */
+.si{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.sn{display:flex;align-items:center;gap:6px}.sn .si{color:var(--sc)}
+.badge{font-style:normal;background:var(--warn);color:#fff;border-radius:99px;padding:0 8px;font-size:11px;text-transform:none;letter-spacing:0}
+.sec summary{display:flex;align-items:center;gap:8px}.sec summary .si{color:var(--sc)}
+.hd .hr{display:flex;align-items:center;gap:6px}
+.icbtn{width:40px;height:40px;border-radius:10px;border:1px solid var(--line);background:var(--card);font-size:18px;line-height:1}
+.hero{background:var(--card);border:1px solid var(--line);border-inline-start:6px solid var(--sc,var(--acc));border-radius:14px;padding:14px 16px;margin:0 0 14px}
+.hero.ok{border-inline-start-color:var(--ok)}.hero p{margin:0}
+.hl{display:flex;justify-content:space-between;gap:8px;color:var(--mut);font-size:14px}.hl b{color:var(--sc,var(--acc));font-size:13px;text-transform:uppercase;letter-spacing:.04em}[dir=rtl] .hl b{text-transform:none;letter-spacing:0}
+.ht{font-size:19px;font-weight:700;margin:4px 0;text-wrap:balance}.hs{color:var(--mut);font-size:14px;font-variant-numeric:tabular-nums}
+.hero .row{margin-top:10px}.hero .primary{margin:0;font-size:15px;min-height:44px}
+.banner.warn{background:color-mix(in srgb,var(--warn) 16%,var(--card));border:1px solid var(--warn)}
+.banner.inst{display:flex;flex-direction:column;gap:8px}.banner.inst p{margin:2px 0 0;color:var(--mut);font-size:14px}
+.ev.past{opacity:.6}.ev.is-missed{border-color:var(--warn)}
+.mk.tmr{font-size:15px}
+.stepper{display:flex;gap:8px;list-style:none;padding:0;margin:0 0 16px}.stepper li{flex:1;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--mut);padding:8px 10px;border-radius:10px;background:var(--soft)}
+.stepper li span{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--card);border:1px solid var(--line);font-weight:700;font-size:12px}
+.stepper li.on{background:var(--acc);color:var(--acc-ink);font-weight:700}.stepper li.dn span{background:var(--ok);color:#fff;border-color:var(--ok)}
+.wnav{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:8px 0 16px}.wnav .primary{margin:0}
+.tpls{display:flex;flex-wrap:wrap;gap:8px}.chip.wide{width:auto;padding:0 14px}
+.bz{border-top:1px solid var(--line);padding:12px 0;display:flex;flex-direction:column;gap:10px}
+.seg{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px}.seg label{flex-direction:column;cursor:pointer}.seg input{position:absolute;opacity:0}
+.seg span{display:flex;flex-direction:column;gap:2px;border:1px solid var(--line);border-radius:12px;padding:10px 12px;color:var(--ink);background:var(--bg);min-height:56px}.seg small{color:var(--mut);font-size:12px}
+.seg input:checked+span{border-color:var(--acc);box-shadow:0 0 0 2px var(--acc) inset}.seg input:focus-visible+span{outline:3px solid var(--acc);outline-offset:2px}
+.sl{list-style:none;padding:0;margin:0}.sl li{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line)}.sl .si{color:var(--sc)}.sl span{flex:1}.sl i{font-style:normal;color:var(--mut);font-size:13px}
+.chart{display:flex;gap:6px;height:170px;margin-bottom:8px}.yax{display:flex;flex-direction:column;justify-content:space-between;font-size:11px;color:var(--mut);padding:2px 0 18px}
+.plot{flex:1;display:flex;gap:4px;align-items:stretch;background:linear-gradient(var(--line),var(--line)) 0 0/100% 1px no-repeat,linear-gradient(var(--line),var(--line)) 0 calc((100% - 18px)/2)/100% 1px no-repeat,linear-gradient(var(--line),var(--line)) 0 calc(100% - 18px)/100% 1px no-repeat}
+.plot .wb{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0}.plot .wb em{font-style:normal;font-size:10px;color:var(--mut);height:14px;font-variant-numeric:tabular-nums}
+.plot .wb>div{flex:1;width:100%;display:flex;align-items:flex-end;background:none;border-radius:0}.plot .wb i{display:block;width:100%;background:var(--acc);border-radius:4px 4px 0 0;opacity:.55;min-height:0}.plot .wb.cur i{opacity:1}.plot .wb small{height:16px;font-size:11px;color:var(--mut)}
+.wbars{display:none}
+.heat{display:grid;grid-template-columns:repeat(7,minmax(0,34px));gap:4px;margin-bottom:8px}.heat i{aspect-ratio:1;border-radius:5px;background:color-mix(in srgb,var(--acc) calc(var(--a,0)*100%),var(--soft))}.heat i.fut{background:none;border:1px dashed var(--line)}.heat i.none{background:var(--soft)}
+.sum p{margin:6px 0}
+.srow .si{margin-inline-end:6px;color:var(--sc);vertical-align:-3px}
+#timer{position:fixed;inset-inline:12px;bottom:74px;max-width:696px;margin:0 auto;background:var(--ink);color:var(--bg);border-radius:14px;padding:10px 12px;display:none;align-items:center;gap:10px;z-index:7}#timer.on{display:flex}
+#timer b{font-size:22px;font-variant-numeric:tabular-nums}#timer span{flex:1;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#timer .ghost{min-height:36px;padding:6px 10px;background:transparent;color:var(--bg);border-color:var(--bg)}
+#sheet{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:flex-end;justify-content:center;z-index:10}#sheet.on{display:flex}
+#sheet .sh{background:var(--card);width:100%;max-width:520px;border-radius:18px 18px 0 0;padding:20px 20px 28px}
+.stepper li.on span{color:var(--acc);background:var(--acc-ink)}
+
+.lk{margin-top:8px}.lk input{width:100%}
+.badges{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}.bdg{padding:6px 12px;border-radius:999px;border:1px solid var(--line);color:var(--mut);font-size:14px;opacity:.7}.bdg.on{background:var(--soft);color:var(--ink);border-color:var(--acc);opacity:1;font-weight:600}
+.cmap{border-top:1px solid var(--line);padding:6px 0;border-inline-start:4px solid var(--sc);padding-inline-start:10px;margin-bottom:6px}.cmap summary{cursor:pointer;display:flex;align-items:center;gap:8px;font-weight:600;padding:6px 0}.cmap summary b{margin-inline-start:auto}
+.cm{list-style:none;margin:8px 0 0;padding:0}.cm li{display:flex;gap:10px;padding:5px 0;font-size:15px;color:var(--mut)}.cm li.v2{color:var(--ink)}.cm li i{font-style:normal;width:18px;text-align:center}
+textarea[data-ref]{width:100%}
 </style></head><body>
-<header><div class="hd"><h1 id="ttl">Plan Builder</h1><button class="link" id="langbtn" type="button">العربية</button></div></header>
+<header><div class="hd"><h1 id="ttl">Planny</h1><div class="hr"><button class="icbtn" id="themebtn" type="button" aria-label="Theme"><svg class="si" viewBox="0 0 24 24" style="width:20px;height:20px"><circle cx="12" cy="12" r="9"/><path d="M12 3v18" /><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/></svg></button><button class="link" id="langbtn" type="button">العربية</button></div></div></header>
 <main id="app"></main>
-<div id="toast" role="status" aria-live="polite"></div><div id="confirm" role="alertdialog"></div>
+<div id="timer" role="timer"></div><div id="sheet"></div><div id="toast" role="status" aria-live="polite"></div><div id="confirm" role="alertdialog"></div>
 <nav><div id="nav">
 <button data-v="today" type="button"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>Today</span></button>
 <button data-v="plan" type="button"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg><span>Plan</span></button>
@@ -193,15 +240,25 @@ function splitBi(s){const a=s.split(' | ');return {en:a[0].trim(),ar:(a[1]||a[0]
 const LIB=RAW.map(r=>({id:r[0],sec:r[1],kind:r[2],n:r[3],m:r[4],slot:r[5],name:splitBi(r[6]),topics:r[7]?r[7].split(';;').map(splitBi):[]}));
 LIB.forEach(c=>{if(c.kind==='workout')c.topics=WORKOUTS.map(w=>({en:w.en,ar:w.ar,ex:w.ex}))});
 const LIBMAP={};LIB.forEach(c=>LIBMAP[c.id]=c);
-function defaultProfile(){return {start:addDays(todayISO(),1),weeks:12,wake:'05:00',sleep:'22:30',workDays:[0,1,2,3,4],workStart:'09:00',workEnd:'17:00',commute:45,windDown:60,restDays:[5],morningBuffer:30,offMorningEnd:'13:00',offEveningStart:'16:00'}}
+function defaultProfile(){return {start:addDays(todayISO(),1),weeks:12,wake:'05:00',sleep:'22:30',workDays:[0,1,2,3,4],workStart:'09:00',workEnd:'17:00',commute:45,windDown:60,restDays:[5],morningBuffer:30,offMorningEnd:'13:00',offEveningStart:'16:00',busy:[],pauses:[],seasons:[],pace:'standard'}}
+const PACE={light:{n:.6,m:.85},standard:{n:1,m:1},intense:{n:1.3,m:1.15}};
+const TEMPLATES=[{id:'acc',en:'New accountant',ar:'محاسب جديد',items:['fin','excel','en','qnew','home']},{id:'dev',en:'Learn programming',ar:'تعلّم البرمجة',items:['py','sql','en','home']},{id:'lng',en:'Languages + fitness',ar:'لغات ولياقة',items:['en','es','run']},{id:'qur',en:'Quran + fitness',ar:'قرآن ولياقة',items:['qnew','qread','home']},{id:'grow',en:'Career growth',ar:'تطوير مهني',items:['time','comm','excel','en']}];
 // resolve a stored subject record into a full subject
-function resolveSubject(rec){
+function resolveSubject(rec,pace){
+  const f=PACE[pace||'standard']||PACE.standard;
   const base=rec.cid?LIBMAP[rec.cid]:null;
   const sec=base?base.sec:'custom';
   return {id:rec.id,cid:rec.cid||null,sec,kind:base?base.kind:'study',name:base?base.name:{en:rec.name,ar:rec.name},
-    n:rec.n,m:rec.m,slot:rec.slot||(base?base.slot:'evening'),topics:base?base.topics:(rec.topics||[]).map(t=>({en:t,ar:t})),
+    n:rec.n,m:rec.m,slot:rec.slot||(base?base.slot:'evening'),link:rec.link||'',topics:base?base.topics:(rec.topics||[]).map(t=>({en:t,ar:t})),
     review:(base?base.kind==='study'||base.kind==='lang':true),ignoreRest:(sec==='quran'),
     startPage:rec.startPage||1,pages:rec.pages||(base&&base.kind==='quran'?2:3)};
+}
+function withPace(sub,pace){const f=PACE[pace||'standard']||PACE.standard;if(sub.sec==='quran'||f===PACE.standard)return sub;return {...sub,n:Math.min(7,Math.max(1,Math.round(sub.n*f.n))),m:Math.max(10,Math.round(sub.m*f.m/5)*5)}
+}
+function seasonFor(p,iso){
+  const z=(p.seasons||[]).find(x=>x.from&&x.to&&x.from<=iso&&iso<=x.to);
+  if(!z)return p;
+  const o={...p};['wake','sleep','workStart','workEnd'].forEach(k=>{if(z[k])o[k]=z[k]});if(z.commute!==undefined&&z.commute!=='')o.commute=+z.commute;return o;
 }
 function windowsFor(p,d,rest){
   const wake=toMin(p.wake),sleep=toMin(p.sleep),w=[];
@@ -218,18 +275,31 @@ function windowsFor(p,d,rest){
     const es=toMin(p.offEveningStart),ee=sleep-30;
     if(ee-es>=20)w.push({k:'evening',s:es,e:ee});
   }
-  return w.map(x=>({...x,cur:x.s}));
+  return subtractBusy(w.map(x=>({...x,cur:x.s})),p.busy,d).sort((a,b)=>a.s-b.s);
+}
+function subtractBusy(ws,busy,d){
+  const bl=(busy||[]).filter(b=>b.days&&b.days.includes(d)&&b.start&&b.end).map(b=>[toMin(b.start),toMin(b.end)]).filter(x=>x[1]>x[0]);
+  let out=ws;
+  for(const [bs,be] of bl){const n=[];for(const w of out){if(be<=w.s||bs>=w.e){n.push(w);continue}if(bs-w.s>=20)n.push({...w,e:bs,cur:w.s});if(w.e-be>=20)n.push({...w,s:be,cur:be})}out=n}
+  return out;
 }
 function weeklyCapacity(p){let t=0;for(let d=0;d<7;d++){if(p.restDays.includes(d))continue;windowsFor(p,d,false).forEach(w=>t+=w.e-w.s)}return t}
 function weeklyDemand(subs){return subs.reduce((a,s)=>a+s.n*(s.m+GAP),0)}
 function tryPlace(day,s){
   const ws=day.wins;if(!ws.length)return false;
-  let order=s.slot==='morning'?['morning','evening']:s.slot==='evening'?['evening','morning']:null;
-  let list=order?order.map(k=>ws.find(w=>w.k===k)).filter(Boolean):ws.slice().sort((a,b)=>(b.e-b.cur)-(a.e-a.cur));
+  const order=s.slot==='morning'?['morning','evening']:s.slot==='evening'?['evening','morning']:null;
+  let list;
+  if(order){list=[];order.forEach(k=>ws.filter(w=>w.k===k).sort((a,b)=>a.s-b.s).forEach(w=>list.push(w)))}
+  else list=ws.slice().sort((a,b)=>(b.e-b.cur)-(a.e-a.cur));
   for(const w of list){if(w.cur+s.m<=w.e){const st=w.cur;w.cur=st+s.m+GAP;day.events.push({sid:s.id,start:st,end:st+s.m,sub:s});return true}}
   return false;
 }
 function stepsFor(s,ev,lang){
+  const st=stepsFor0(s,ev,lang);
+  if(ev.recap&&ev.recap.length&&!ev.short&&!ev.review){const r=Math.max(2,Math.round((ev.end-ev.start)*.12));st.forEach(x=>x.min=Math.max(1,Math.round(x.min*.88)));st.unshift({text:(lang==='ar'?'استرجاع سريع: ':'Quick recap: ')+ev.recap.map(o=>pick(o,lang)).join(' · '),min:r})}
+  return st;
+}
+function stepsFor0(s,ev,lang){
   const m=ev.end-ev.start,T=(en,ar,f)=>({text:lang==='ar'?ar:en,min:Math.max(1,Math.round(m*f))});
   if(ev.review)return [T("Re-read your notes from this week's topics","أعد قراءة ملاحظاتك عن مواضيع الأسبوع",.35),T('Test yourself without looking: questions or a quick exercise','اختبر نفسك بدون النظر: أسئلة أو تمرين سريع',.45),T('Fix your mistakes and note what is still weak','صحح أخطاءك وسجّل ما زال ضعيفًا',.2)];
   switch(s.kind){
@@ -241,15 +311,29 @@ function stepsFor(s,ev,lang){
     default:return [T('Read or watch the topic','اقرأ أو شاهد الموضوع',.4),T('Practice: solve exercises or apply it yourself','تدرّب: حل تمارين أو طبّقه بنفسك',.4),T('Write a 3-line summary and note your mistakes','اكتب ملخصًا من ٣ أسطر وسجّل أخطاءك',.2)];
   }
 }
-function buildPlan(p,subjects){
+function assignTopics(list,idxs,topics){
+  const M=idxs.length,N=list.length;if(!M||!N)return;
+  list.forEach((e,k)=>{
+    const st=Math.floor(k*M/N),en=Math.floor((k+1)*M/N);
+    if(en>st){e._idx=idxs.slice(st,en);e.topics=e._idx.map(i=>topics[i]);e.part=null}
+    else{e._idx=[idxs[Math.min(st,M-1)]];e.topics=[topics[e._idx[0]]];e._st=st}
+  });
+  const grp={};list.forEach(e=>{if(e._st!==undefined&&e.topics&&e._idx.length===1&&!(e._idx.length>1))(grp[e._idx[0]]=grp[e._idx[0]]||[]).push(e)});
+  Object.values(grp).forEach(a=>{if(a.length>1)a.forEach((e,i)=>e.part=[i+1,a.length])});
+}
+function buildPlan(p,subjects,ctx){
   const N=p.weeks*7,days=[];
-  for(let i=0;i<N;i++){const iso=addDays(p.start,i),d=dow(iso),rest=p.restDays.includes(d);days.push({iso,i,dow:d,week:Math.floor(i/7)+1,rest,work:p.workDays.includes(d)&&!rest,wins:windowsFor(p,d,rest),events:[]})}
-  let overflow=0;const byS={};subjects.forEach(s=>byS[s.id]=[]);
+  for(let i=0;i<N;i++){
+    const iso=addDays(p.start,i),d=dow(iso),rest=p.restDays.includes(d),ep=seasonFor(p,iso);
+    const paused=(p.pauses||[]).some(x=>x.from&&x.to&&x.from<=iso&&iso<=x.to);
+    days.push({iso,i,dow:d,week:Math.floor(i/7)+1,rest,paused,work:p.workDays.includes(d)&&!rest&&!paused,ep,wins:paused?[]:windowsFor(ep,d,rest),events:[]});
+  }
+  let overflow=0;
   for(let w=0;w<p.weeks;w++){
     const wd=days.slice(w*7,w*7+7);
     for(const s of subjects){
-      let cands=wd.filter(d=>d.wins.length&&(s.ignoreRest||!d.rest));
-      if(!cands.length){overflow+=s.n;continue}
+      const cands=wd.filter(d=>d.wins.length&&(s.ignoreRest||!d.rest));
+      if(!cands.length){if(wd.some(d=>!d.paused&&(s.ignoreRest||!d.rest)))overflow+=s.n;continue}
       const n=Math.min(s.n,cands.length),used=new Set();
       for(let j=0;j<n;j++){
         const target=(j+0.5)*cands.length/n-0.5;
@@ -260,30 +344,53 @@ function buildPlan(p,subjects){
     }
   }
   days.forEach(d=>d.events.sort((a,b)=>a.start-b.start));
-  // sessions per subject in order
+  const today=ctx&&ctx.today,st=(ctx&&ctx.status)||{},moves=(ctx&&ctx.moves)||{},mini=(ctx&&ctx.mini)||{};let missedCount=0;const dayMap={};days.forEach(d=>dayMap[d.iso]=d);
   subjects.forEach(s=>{
     const list=[];days.forEach(d=>d.events.forEach(e=>{if(e.sid===s.id)list.push({d,e})}));
     list.forEach((x,k)=>{x.e.k=k;x.e.iso=x.d.iso;x.e.week=x.d.week;x.e.key=x.d.iso+'|'+s.id+'|'+k});
     const perWeek={};list.forEach(x=>(perWeek[x.d.week]=perWeek[x.d.week]||[]).push(x));
     if(s.review)Object.values(perWeek).forEach(a=>{if(a.length>=3)a[a.length-1].e.review=true});
-    const normal=list.filter(x=>!x.e.review),M=s.topics.length,Nn=normal.length;
-    normal.forEach((x,k)=>{
-      if(s.kind==='quran'||s.kind==='qread'){
-        const a=s.startPage+k*s.pages,b=a+s.pages-1,wrap=v=>((v-1)%604)+1;
-        x.e.pages=[wrap(a),wrap(b)];
-        if(s.kind==='quran'&&k>0)x.e.reviewPages=[wrap(Math.max(s.startPage,a-s.pages*5)),wrap(a-1)];
-        return;
-      }
-      if(!M)return;
-      if(s.kind==='workout'||s.kind==='habit'){x.e.topics=[s.topics[k%M]];return}
-      const st=Math.floor(k*M/Nn),en=Math.floor((k+1)*M/Nn);
-      if(en>st)x.e.topics=s.topics.slice(st,en);
-      else{x.e.topics=[s.topics[Math.min(st,M-1)]];x.e._st=st}
+    const normal=list.filter(x=>!x.e.review),M=s.topics.length;
+    const isQ=s.kind==='quran'||s.kind==='qread',isCyc=s.kind==='workout'||s.kind==='habit';
+    const wrap=v=>((v-1)%604)+1;
+    const setPages=(e,a)=>{const b=a+s.pages-1;e.pages=[wrap(a),wrap(b)];e._end=b;if(s.kind==='quran'&&a>s.startPage)e.reviewPages=[wrap(Math.max(s.startPage,a-s.pages*5)),wrap(a-1)]};
+    if(isQ)normal.forEach((x,k)=>setPages(x.e,s.startPage+k*s.pages));
+    else if(isCyc){if(M)normal.forEach((x,k)=>{x.e.topics=[s.topics[k%M]]})}
+    else if(M)assignTopics(normal.map(x=>x.e),s.topics.map((_,i)=>i),s.topics);
+    list.forEach(x=>{
+      const mv=moves[x.e.key];
+      if(mv&&dayMap[mv.iso]){const dur=x.e.end-x.e.start,od=x.d,nd=dayMap[mv.iso];od.events.splice(od.events.indexOf(x.e),1);nd.events.push(x.e);x.e.start=mv.start;x.e.end=mv.start+dur;x.e.iso=mv.iso;x.e.week=nd.week;x.e.moved=true}
+      if(mini[x.e.key]){x.e.end=x.e.start+10;x.e.short=true}
     });
-    const grp={};normal.forEach(x=>{if(x.e._st!==undefined)(grp[x.e._st]=grp[x.e._st]||[]).push(x.e)});
-    Object.values(grp).forEach(a=>{if(a.length>1)a.forEach((e,i)=>e.part=[i+1,a.length])});
+    if(today){
+      list.forEach(x=>{const v=st[x.e.key];if(x.e.iso<today&&v!=='d'&&v!=='h'){x.e.missed=true;missedCount++}});
+      const fut=normal.filter(x=>x.e.iso>=today).map(x=>x.e);
+      if(fut.length){
+        if(isQ){
+          let next=s.startPage;normal.forEach(x=>{if(x.e.iso<today&&!x.e.missed&&x.e._end!==undefined)next=Math.max(next,x.e._end+1)});
+          fut.forEach((e,j)=>{e.reviewPages=null;setPages(e,next+j*s.pages)});
+        }else if(!isCyc&&M){
+          const missedIdx=[];normal.forEach(x=>{if(x.e.iso<today&&x.e.missed&&x.e._idx)x.e._idx.forEach(i=>missedIdx.push(i))});
+          const futIdx=[];fut.forEach(e=>(e._idx||[]).forEach(i=>futIdx.push(i)));
+          const rem=[...new Set([...missedIdx,...futIdx])].sort((a,b)=>a-b);
+          fut.forEach(e=>{e._st=undefined;e.part=null});
+          assignTopics(fut,rem,s.topics);
+        }
+      }
+    }
+    if(!isQ&&!isCyc&&M){
+      normal.forEach((x,k)=>{
+        const r=[];[1,3,7].forEach(o=>{const y=normal[k-o];if(y&&y.e.topics&&y.e.topics[0]&&!y.e.missed&&!r.includes(y.e.topics[0]))r.push(y.e.topics[0])});
+        if(r.length)x.e.recap=r;
+      });
+      Object.values(perWeek).forEach(a=>{
+        const nm=a.filter(x=>!x.e.review),tp=[];nm.forEach(x=>(x.e.topics||[]).forEach(o=>{if(!tp.includes(o))tp.push(o)}));
+        a.forEach(x=>{if(x.e.review)x.e.weekTopics=tp});
+      });
+    }
   });
-  return {days,overflow};
+  days.forEach(d=>d.events.sort((a,b)=>a.start-b.start));
+  return {days,overflow,missed:missedCount};
 }
 function parseTopics(text){
   const out=[];
@@ -301,107 +408,229 @@ function buildPrompt(o){
   const N=o.n*o.weeks,L=o.lang==='ar'?'Arabic':'English';
   return 'I want to learn: '+o.goal+'. I can study '+o.n+' sessions per week, '+o.m+' minutes each, for '+o.weeks+' weeks (about '+N+' sessions). Build me a study curriculum as a numbered list of '+N+' topics or fewer, in a logical order from beginner to advanced. Output ONLY the numbered list: one topic per line, a short title of at most 10 words, no explanations, no headings, no extra text. Reply in '+L+'.';
 }
-if(false)module.exports={buildPlan,defaultProfile,resolveSubject,LIB,parseTopics,buildPrompt,weeklyCapacity,weeklyDemand,addDays,dow,fmtTime,windowsFor};
+if(false)module.exports={withPace,PACE,TEMPLATES,buildPlan,defaultProfile,resolveSubject,LIB,parseTopics,buildPrompt,weeklyCapacity,weeklyDemand,addDays,dow,fmtTime,windowsFor};
 
 const T={en:{
-app:'Plan Builder',today:'Today',plan:'Plan',progress:'Progress',setup:'Setup',
-dayOf:'Day {i} of {n} · Week {w}',notStarted:'Your plan starts on {d}. Come back then, or browse the plan.',ended:'This day is after the end of your plan.',
-noEvents:'Nothing scheduled for this day.',restDay:'Rest day',work:'Work',commute:'including commute',details:'Details',
+app:'Planny',today:'Today',plan:'Plan',progress:'Progress',setup:'Setup',
+dayOf:'Day {i} of {n} · Week {w}',notStarted:'Your plan starts on {d}. Browse the plan, or come back then.',ended:'This day is after the end of your plan.',
+noEvents:'Nothing scheduled for this day.',restDay:'Rest day',pausedDay:'Paused',work:'Work',commute:'including commute',details:'Details',notes:'Your notes',
 done:'Done',no:'Not done',half:'Partial',dayDone:'{a} of {b} done',review:'Weekly review & practice',session:'Session {k}',part:'part {i} of {n}',
-memorize:'Memorize pages {a}–{b}',readp:'Read pages {a}–{b}',revPages:'Review pages {a}–{b} (last sessions)',exTitle:'Exercises',
-rate:'Commitment',doneAll:'Activities done',streak:'Day streak',daysLeft:'Days left',byWeek:'By week',bySubject:'By subject',elapsedNote:'Counted from activities scheduled up to today.',
-week:'Week {w}',open:'Open',acts:'{a}/{b}',
-s_title:'Build your plan',s_intro:'Tell the app your schedule and what you want to learn. It places every activity at a real time of day, around work and sleep.',
-s_sched:'1. Your schedule',startDate:'Start date',weeks:'Weeks',wake:'Wake up',sleepT:'Sleep',workDays:'Work days',workStart:'Work starts',workEnd:'Work ends',commuteL:'Commute, one way (min)',windL:'Rest after getting home (min)',restDays:'Rest days (no study)',
-s_subj:'2. What do you want to work on?',perWeek:'sessions / week',mins:'minutes',startPage:'Start page',pagesPer:'Pages per session',
-cap:'Weekly time check',capLine:'You asked for {d} of activities. Your schedule has about {c} free.',capOk:'This fits your week.',capTight:'This is tight. Remove a subject or shorten sessions.',capOver:'This does not fit. Remove a subject or shorten sessions.',
-many:'You picked {n} learning subjects. Most working people keep to 2–3 at a time.',
+memorize:'Memorize pages {a}–{b}',readp:'Read pages {a}–{b}',revPages:'Review pages {a}–{b} (recent sessions)',exTitle:'Exercises',missed:'Missed',
+missedBanner:'{n} past sessions were missed. Their topics and pages moved forward to your coming sessions.',
+nowL:'Now',nextL:'Up next',inT:'in {x}',leftT:'{x} left',allDone:'All done for today. Nice work.',noMore:'No more sessions today.',startTimer:'Start timer',copyDay:'Copy today as text',copiedDay:'Copied.',
+timerDone:'Time is up.',pause:'Pause',resume:'Resume',stop:'Stop',
+rate:'Commitment',doneAll:'Activities done',streak:'Day streak',daysLeft:'Days left',byWeek:'Commitment by week',bySubject:'By subject',elapsedNote:'Counted from activities scheduled up to today.',heat:'Daily completion',
+wsLast:'Last week',wsThis:'This week so far',wsLine:'You finished {a} of {b} sessions ({p}%).',wsBest:'Strongest: {s}.',wsWeak:'Needs attention: {s}.',wsGood:'A strong week. Keep the same rhythm.',wsMid:'A steady week. Pick one session to protect next week.',wsLow:'A tough week. Missed topics move forward automatically; consider the Light pace in Setup.',
+week:'Week {w}',acts:'{a}/{b}',calTitle:'Add to your phone calendar',calRange:'Range',cal7:'Next 7 days',cal30:'Next 30 days',calAll:'Whole plan',calBtn:'Download calendar file',calNote:'Opens in your calendar app with a reminder 10 minutes before each session.',calNone:'No upcoming sessions in that range.',
+st1:'Schedule',st2:'Subjects',st3:'Review',next:'Next',back:'Back',
+s_title1:'When are you free?',s_intro1:'Tell Planny your day. It places every activity at a real time, around work and sleep.',
+startDate:'Start date',weeks:'Weeks',wake:'Wake up',sleepT:'Sleep',workDays:'Work days',workStart:'Work starts',workEnd:'Work ends',commuteL:'Commute, one way (min)',windL:'Rest after getting home (min)',restDays:'Rest days (no study)',
+busyT:'Fixed times (prayers, family, gym)',busyIntro:'Planny will not schedule anything during these times.',busyAdd:'Add a fixed time',busyName:'Name',from:'From',to:'To',pauseT:'Breaks (travel, holidays)',pauseIntro:'Planny skips these days without breaking your plan.',pauseAdd:'Add a break',remove:'Remove',
+s_title2:'What do you want to work on?',s_intro2:'Start from a template, or pick subjects one by one.',quick:'Quick start',perWeek:'sessions / week',mins:'minutes',startPage:'Start page',pagesPer:'Pages per session',pickSlot:'Time of day',morning:'Morning',evening:'Evening',anySlot:'Any',
+s_title3:'Review and build',s_intro3:'Check that it fits your week, then build your plan.',paceT:'Pace',pLight:'Light',pStd:'Standard',pInt:'Intense',pLightD:'Fewer, shorter sessions',pStdD:'As you set them',pIntD:'More and longer sessions',
+cap:'Weekly time check',capLine:'You asked for {d} of activities. Your schedule has about {c} free.',capOk:'This fits your week.',capTight:'This is tight. Remove a subject or choose the Light pace.',capOver:'This does not fit. Remove a subject or choose the Light pace.',
+many:'You picked {n} learning subjects. Most working people keep to 2–3 at a time.',yourSubj:'Your subjects',noSubj:'No subjects yet. Go back and pick at least one.',
 build:'Build my plan',rebuild:'Rebuild my plan',needOne:'Pick at least one subject.',built:'Plan ready.',
 c_title:'Add another subject',c_intro:'Type what you want to learn. Get a curriculum from an AI tool, paste it here, and it becomes part of your plan.',
 c_name:'Subject name',c_goal:'What do you want to learn, and why?',c_goalPh:'e.g. UI design for web apps, beginner, to build my own app',mkPrompt:'Create the AI request',
 c_step2:'Open an AI tool. Your request is copied for you; paste it into the chat if it does not appear.',openGPT:'Open ChatGPT',openGem:'Open Gemini',openClaude:'Open Claude',copyP:'Copy request',copied:'Copied.',
 c_step3:'Paste the answer here',pasteBtn:'Paste',pasteBlocked:'Your browser blocked the paste button. Tap in the box, then paste with a long press or Ctrl+V.',
-topicsFound:'{n} topics found',noTopics:'No topics found yet.',addSubj:'Add to my plan',remove:'Remove',custom:'Custom',
+topicsFound:'{n} topics found',noTopics:'No topics found yet.',addSubj:'Add to my plan',custom:'Custom',
 backup:'Backup',copyBackup:'Copy my data',restore:'Restore from backup',restoreBtn:'Restore',badBackup:'That backup could not be read.',restored:'Restored.',backupNote:'Your marks and plan are saved on this device only. Copy your data to move it to another device.',
 lang:'العربية',reset:'Start over',resetAsk:'Delete everything and start over?',yes:'Yes, delete',cancel:'Cancel',
-pickSlot:'Time of day',morning:'Morning',evening:'Evening',anySlot:'Any',overflow:'{n} sessions did not fit and were skipped. Shorten sessions or remove a subject.',
-beforeStart:'Starts {d}'},
+overflow:'{n} sessions did not fit and were skipped. Shorten sessions or remove a subject.',
+install:'Install Planny',installBtn:'Install',installHow:'How to install',installBody:'Add Planny to your home screen so it opens like an app.',later:'Not now',close:'Close',
+iAndroid:'Android (Chrome)',iAndroidT:'Tap the ⋮ menu, then "Install app" or "Add to Home screen".',iIphone:'iPhone (Safari)',iIphoneT:'Tap the Share button, then "Add to Home Screen".',iPc:'Windows / Mac (Chrome or Edge)',iPcT:'Click the install icon in the address bar, or open the ⋮ menu and choose "Install Planny".',
+theme:'Theme',tAuto:'Auto',tLight:'Light',tDark:'Dark',yt:'Search YouTube',course:'Open course',courseLink:'Course link (optional)',courseLinkPh:'Paste a course or playlist link',videoLang:'Video search language',vlApp:'Same as app',vlEn:'English',vlAr:'Arabic',videos:'Learn from videos',
+quizT:'Quiz me on this week',quizNote:'Opens an AI chat with a ready quiz request.',
+move:'Move session',moveTo:'New date and time',moveSave:'Save',moveReset:'Back to original',movedB:'Moved',
+miniOn:'Do a 10-minute version',miniOff:'Back to full length',shortB:'10 min',
+late:'I got home late',lateQ:'Shift today\'s remaining sessions by',lateGo:'Shift',lateDone:'Sessions shifted.',min30:'30 min',min60:'1 hour',min90:'1.5 hours',min120:'2 hours',
+seasonT:'Different schedule for a period (e.g. Ramadan)',seasonIntro:'Use other wake, sleep and work times between two dates.',seasonAdd:'Add a period',
+cmapT:'Course map',cmapOf:'{a} of {b} topics done',topicDone:'Done',topicHalf:'Partial',topicTodo:'Not yet',
+badgesT:'Badges',bg_s3:'3-day streak',bg_s7:'7-day streak',bg_s14:'14-day streak',bg_s30:'30-day streak',bg_d10:'10 sessions',bg_d50:'50 sessions',bg_d100:'100 sessions',bg_pw:'Perfect week',
+chalT:'This week\'s challenge',chalLine:'Finish every {s} session this week.',chalProg:'{a} of {b} done',chalWon:'Challenge complete.',
+refT:'One line about your week',refPh:'What worked? What will you change?',refSaved:'Saved.',
+shareT:'Share your setup',shareNote:'Copy a code and send it. Your friend pastes it on their phone to get the same setup. Your marks are not shared.',shareCopy:'Copy setup code',shareIn:'Paste a setup code',shareUse:'Use this setup',shareBad:'That code could not be read.',shareOk:'Setup loaded. Review it, then build.',
+fbBtn:'Send feedback',bkFile:'Download backup file',bkLoad:'Restore from file',bkRem:'It has been a while since your last backup.',bkNow:'Download backup',bkDone:'Backup downloaded.',},
 ar:{
-app:'منظّم الخطة',today:'اليوم',plan:'الخطة',progress:'التقدّم',setup:'الإعداد',
-dayOf:'اليوم {i} من {n} · الأسبوع {w}',notStarted:'خطتك تبدأ يوم {d}. ارجع وقتها، أو تصفّح الخطة.',ended:'هذا اليوم بعد نهاية خطتك.',
-noEvents:'مفيش حاجة مجدولة النهاردة.',restDay:'يوم راحة',work:'الشغل',commute:'شامل المواصلات',details:'التفاصيل',
+app:'Planny',today:'اليوم',plan:'الخطة',progress:'التقدّم',setup:'الإعداد',
+dayOf:'اليوم {i} من {n} · الأسبوع {w}',notStarted:'خطتك تبدأ يوم {d}. تصفّح الخطة أو ارجع وقتها.',ended:'هذا اليوم بعد نهاية خطتك.',
+noEvents:'مفيش حاجة مجدولة في اليوم ده.',restDay:'يوم راحة',pausedDay:'إيقاف مؤقت',work:'الشغل',commute:'شامل المواصلات',details:'التفاصيل',notes:'ملاحظاتك',
 done:'تم',no:'لم يتم',half:'جزئي',dayDone:'تم {a} من {b}',review:'مراجعة الأسبوع وتمارين',session:'الجلسة {k}',part:'جزء {i} من {n}',
-memorize:'احفظ الصفحات {a}–{b}',readp:'اقرأ الصفحات {a}–{b}',revPages:'راجع الصفحات {a}–{b} (آخر الجلسات)',exTitle:'التمارين',
-rate:'نسبة الالتزام',doneAll:'أنشطة تمت',streak:'أيام متتالية',daysLeft:'الأيام المتبقية',byWeek:'حسب الأسبوع',bySubject:'حسب المادة',elapsedNote:'محسوبة من الأنشطة المجدولة حتى اليوم.',
-week:'الأسبوع {w}',open:'فتح',acts:'{a}/{b}',
-s_title:'ابنِ خطتك',s_intro:'اكتب مواعيدك وإيه اللي عايز تتعلمه. التطبيق بيحط كل نشاط في وقت فعلي من اليوم حوالين الشغل والنوم.',
-s_sched:'١. مواعيدك',startDate:'تاريخ البداية',weeks:'عدد الأسابيع',wake:'الاستيقاظ',sleepT:'النوم',workDays:'أيام الشغل',workStart:'بداية الشغل',workEnd:'نهاية الشغل',commuteL:'المواصلات، مشوار واحد (د)',windL:'راحة بعد الوصول للبيت (د)',restDays:'أيام الراحة (بدون مذاكرة)',
-s_subj:'٢. عايز تشتغل على إيه؟',perWeek:'جلسات / أسبوع',mins:'دقيقة',startPage:'صفحة البداية',pagesPer:'صفحات كل جلسة',
-cap:'مراجعة وقت الأسبوع',capLine:'طلبت {d} من الأنشطة. جدولك فيه حوالي {c} فاضية.',capOk:'ده مناسب لأسبوعك.',capTight:'الوقت ضيق. شيل مادة أو قصّر الجلسات.',capOver:'ده مش هيتحمل. شيل مادة أو قصّر الجلسات.',
-many:'اخترت {n} مواد تعلّم. أغلب الشغالين بيكتفوا بـ ٢–٣ مواد في نفس الوقت.',
+memorize:'احفظ الصفحات {a}–{b}',readp:'اقرأ الصفحات {a}–{b}',revPages:'راجع الصفحات {a}–{b} (آخر الجلسات)',exTitle:'التمارين',missed:'فاتت',
+missedBanner:'فاتتك {n} جلسة سابقة. اتنقلت مواضيعها وصفحاتها للجلسات الجاية.',
+nowL:'دلوقتي',nextL:'الجلسة الجاية',inT:'بعد {x}',leftT:'باقي {x}',allDone:'خلّصت كل اليوم. شغل ممتاز.',noMore:'مفيش جلسات تانية النهاردة.',startTimer:'ابدأ المؤقت',copyDay:'انسخ خطة اليوم كنص',copiedDay:'اتنسخ.',
+timerDone:'الوقت خلص.',pause:'إيقاف',resume:'استمرار',stop:'إنهاء',
+rate:'نسبة الالتزام',doneAll:'أنشطة تمت',streak:'أيام متتالية',daysLeft:'الأيام المتبقية',byWeek:'الالتزام حسب الأسبوع',bySubject:'حسب المادة',elapsedNote:'محسوبة من الأنشطة المجدولة حتى اليوم.',heat:'الإنجاز اليومي',
+wsLast:'الأسبوع الماضي',wsThis:'هذا الأسبوع حتى الآن',wsLine:'خلّصت {a} من {b} جلسة ({p}%).',wsBest:'الأقوى: {s}.',wsWeak:'يحتاج اهتمام: {s}.',wsGood:'أسبوع قوي. كمّل بنفس الإيقاع.',wsMid:'أسبوع مستقر. اختر جلسة واحدة تحميها الأسبوع الجاي.',wsLow:'أسبوع صعب. المواضيع الفايتة بتتنقل تلقائيًا؛ فكّر في الوتيرة الخفيفة من الإعداد.',
+week:'الأسبوع {w}',acts:'{a}/{b}',calTitle:'أضف للتقويم في موبايلك',calRange:'المدة',cal7:'الـ ٧ أيام الجاية',cal30:'الـ ٣٠ يوم الجاية',calAll:'الخطة كلها',calBtn:'حمّل ملف التقويم',calNote:'بيفتح في تطبيق التقويم مع تذكير قبل كل جلسة بـ ١٠ دقايق.',calNone:'لا توجد جلسات قادمة في هذه المدة.',
+st1:'المواعيد',st2:'المواد',st3:'المراجعة',next:'التالي',back:'رجوع',
+s_title1:'إمتى بتكون فاضي؟',s_intro1:'اكتب يومك لـ Planny. هيحط كل نشاط في وقت فعلي حوالين الشغل والنوم.',
+startDate:'تاريخ البداية',weeks:'عدد الأسابيع',wake:'الاستيقاظ',sleepT:'النوم',workDays:'أيام الشغل',workStart:'بداية الشغل',workEnd:'نهاية الشغل',commuteL:'المواصلات، مشوار واحد (د)',windL:'راحة بعد الوصول للبيت (د)',restDays:'أيام الراحة (بدون مذاكرة)',
+busyT:'مواعيد ثابتة (صلوات، عيلة، جيم)',busyIntro:'Planny مش هيحط أي نشاط في المواعيد دي.',busyAdd:'أضف موعد ثابت',busyName:'الاسم',from:'من',to:'إلى',pauseT:'فترات توقف (سفر، إجازة)',pauseIntro:'Planny بيتخطى الأيام دي من غير ما تتعطل خطتك.',pauseAdd:'أضف فترة توقف',remove:'حذف',
+s_title2:'عايز تشتغل على إيه؟',s_intro2:'ابدأ من نموذج جاهز، أو اختر المواد واحدة واحدة.',quick:'بداية سريعة',perWeek:'جلسات / أسبوع',mins:'دقيقة',startPage:'صفحة البداية',pagesPer:'صفحات كل جلسة',pickSlot:'وقت اليوم',morning:'صباحًا',evening:'مساءً',anySlot:'أي وقت',
+s_title3:'المراجعة والبناء',s_intro3:'اتأكد إنها مناسبة لأسبوعك، وبعدين ابنِ خطتك.',paceT:'الوتيرة',pLight:'خفيفة',pStd:'متوسطة',pInt:'مكثفة',pLightD:'جلسات أقل وأقصر',pStdD:'زي ما ظبطتها',pIntD:'جلسات أكتر وأطول',
+cap:'مراجعة وقت الأسبوع',capLine:'طلبت {d} من الأنشطة. جدولك فيه حوالي {c} فاضية.',capOk:'ده مناسب لأسبوعك.',capTight:'الوقت ضيق. شيل مادة أو اختر الوتيرة الخفيفة.',capOver:'ده مش هيتحمل. شيل مادة أو اختر الوتيرة الخفيفة.',
+many:'اخترت {n} مواد تعلّم. أغلب الشغالين بيكتفوا بـ ٢–٣ مواد في نفس الوقت.',yourSubj:'موادك',noSubj:'مفيش مواد لسه. ارجع واختر مادة على الأقل.',
 build:'ابنِ خطتي',rebuild:'أعد بناء خطتي',needOne:'اختر مادة واحدة على الأقل.',built:'الخطة جاهزة.',
 c_title:'أضف مادة أخرى',c_intro:'اكتب اللي عايز تتعلمه. هات المنهج من أداة ذكاء اصطناعي، والصقه هنا، ويبقى جزء من خطتك.',
 c_name:'اسم المادة',c_goal:'عايز تتعلم إيه، وليه؟',c_goalPh:'مثلًا: تصميم واجهات المواقع، مبتدئ، عشان أعمل تطبيقي',mkPrompt:'اعمل طلب الذكاء الاصطناعي',
 c_step2:'افتح أداة ذكاء اصطناعي. الطلب بيتنسخ لك؛ الصقه في المحادثة لو ما ظهرش لوحده.',openGPT:'افتح ChatGPT',openGem:'افتح Gemini',openClaude:'افتح Claude',copyP:'انسخ الطلب',copied:'اتنسخ.',
 c_step3:'الصق الرد هنا',pasteBtn:'الصق',pasteBlocked:'المتصفح منع زرار اللصق. اضغط داخل الخانة والصق بالضغط المطوّل أو Ctrl+V.',
-topicsFound:'تم العثور على {n} موضوع',noTopics:'لا توجد مواضيع بعد.',addSubj:'أضفها لخطتي',remove:'حذف',custom:'مخصصة',
+topicsFound:'تم العثور على {n} موضوع',noTopics:'لا توجد مواضيع بعد.',addSubj:'أضفها لخطتي',custom:'مخصصة',
 backup:'نسخة احتياطية',copyBackup:'انسخ بياناتي',restore:'استرجاع من نسخة',restoreBtn:'استرجع',badBackup:'تعذّرت قراءة النسخة.',restored:'تم الاسترجاع.',backupNote:'علاماتك وخطتك محفوظة على هذا الجهاز فقط. انسخ بياناتك لتنقلها لجهاز آخر.',
 lang:'English',reset:'ابدأ من جديد',resetAsk:'حذف كل شيء والبدء من جديد؟',yes:'نعم، احذف',cancel:'إلغاء',
-pickSlot:'وقت اليوم',morning:'صباحًا',evening:'مساءً',anySlot:'أي وقت',overflow:'{n} جلسة لم تتسع وتم تخطيها. قصّر الجلسات أو احذف مادة.',
-beforeStart:'تبدأ {d}'}};
-let S=load(),view=S.built?'today':'setup',selDate=null,toastT=null;
+overflow:'{n} جلسة لم تتسع وتم تخطيها. قصّر الجلسات أو احذف مادة.',
+install:'ثبّت Planny',installBtn:'تثبيت',installHow:'طريقة التثبيت',installBody:'أضف Planny للشاشة الرئيسية ليفتح زي أي تطبيق.',later:'مش دلوقتي',close:'إغلاق',
+iAndroid:'أندرويد (كروم)',iAndroidT:'اضغط قايمة ⋮ ثم "تثبيت التطبيق" أو "إضافة إلى الشاشة الرئيسية".',iIphone:'آيفون (سفاري)',iIphoneT:'اضغط زرار المشاركة ثم "إضافة إلى الشاشة الرئيسية".',iPc:'ويندوز / ماك (كروم أو إيدج)',iPcT:'اضغط أيقونة التثبيت في شريط العنوان، أو من قايمة ⋮ اختر "تثبيت Planny".',
+theme:'المظهر',tAuto:'تلقائي',tLight:'فاتح',tDark:'داكن',yt:'ابحث في يوتيوب',course:'افتح الكورس',courseLink:'لينك الكورس (اختياري)',courseLinkPh:'الصق لينك كورس أو قائمة تشغيل',videoLang:'لغة البحث في الفيديوهات',vlApp:'زي لغة التطبيق',vlEn:'إنجليزي',vlAr:'عربي',videos:'اتعلم من الفيديوهات',
+quizT:'اختبرني في أسبوعي',quizNote:'بيفتح محادثة ذكاء اصطناعي بطلب اختبار جاهز.',
+move:'انقل الجلسة',moveTo:'التاريخ والوقت الجديد',moveSave:'حفظ',moveReset:'رجّعها لمكانها',movedB:'منقولة',
+miniOn:'اعملها نسخة ١٠ دقايق',miniOff:'ارجع للمدة الكاملة',shortB:'١٠ د',
+late:'رجعت البيت متأخر',lateQ:'أزحّ باقي جلسات النهاردة بمقدار',lateGo:'أزِح',lateDone:'اتزحزحت الجلسات.',min30:'٣٠ دقيقة',min60:'ساعة',min90:'ساعة ونص',min120:'ساعتين',
+seasonT:'جدول مختلف لفترة (مثل رمضان)',seasonIntro:'استخدم مواعيد استيقاظ ونوم وشغل تانية بين تاريخين.',seasonAdd:'أضف فترة',
+cmapT:'خريطة الكورس',cmapOf:'تم {a} من {b} موضوع',topicDone:'تم',topicHalf:'جزئي',topicTodo:'لسه',
+badgesT:'الأوسمة',bg_s3:'٣ أيام متتالية',bg_s7:'٧ أيام متتالية',bg_s14:'١٤ يوم متتالي',bg_s30:'٣٠ يوم متتالي',bg_d10:'١٠ جلسات',bg_d50:'٥٠ جلسة',bg_d100:'١٠٠ جلسة',bg_pw:'أسبوع مثالي',
+chalT:'تحدي الأسبوع',chalLine:'خلّص كل جلسات {s} الأسبوع ده.',chalProg:'تم {a} من {b}',chalWon:'التحدي اكتمل.',
+refT:'سطر عن أسبوعك',refPh:'إيه اللي نجح؟ وإيه اللي هتغيّره؟',refSaved:'اتحفظ.',
+shareT:'شارك إعدادك',shareNote:'انسخ كود وابعته. صاحبك يلصقه في موبايله ويجيله نفس الإعداد. علاماتك مش بتتشارك.',shareCopy:'انسخ كود الإعداد',shareIn:'الصق كود إعداد',shareUse:'استخدم الإعداد ده',shareBad:'تعذّرت قراءة الكود.',shareOk:'اتحمّل الإعداد. راجعه وبعدين ابنِ.',
+fbBtn:'ابعت رأيك',bkFile:'حمّل ملف النسخة الاحتياطية',bkLoad:'استرجاع من ملف',bkRem:'من فترة ما عملتش نسخة احتياطية.',bkNow:'حمّل نسخة',bkDone:'اتحمّلت النسخة.',}};
+const FEEDBACK_URL='';
+const EVOPEN=new Set();let movingKey=null;
+const ICONS={prof:'<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M3 13h18"/>',office:'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',acct:'<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 12h2M12 12h2M8 16h2M12 16h2"/>',prog:'<path d="M8 8l-4 4 4 4M16 8l4 4-4 4M14 5l-4 14"/>',lang:'<path d="M4 5h16v11H9l-5 4z"/>',quran:'<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M8 7h7"/>',health:'<path d="M12 20s-8-5-8-11a4.5 4.5 0 0 1 8-2.5A4.5 4.5 0 0 1 20 9c0 6-8 11-8 11z"/>',custom:'<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>'};
+const icon=id=>'<svg class="si" viewBox="0 0 24 24" aria-hidden="true">'+(ICONS[id]||ICONS.custom)+'</svg>';
 const OPEN=new Set();
+let S=load(),view=S.built?'today':'setup',wz=1,selDate=null,toastT=null,deferred=null,timer=null,timerInt=null,audioCtx=null;
 let draft={name:'',goal:'',n:3,m:30,prompt:'',paste:''};
 function guessLang(){try{return (navigator.language||'en').toLowerCase().startsWith('ar')?'ar':'en'}catch(e){return 'en'}}
-function load(){try{const j=JSON.parse(localStorage.getItem('planner.v1'));if(j&&j.v===1&&j.profile)return j}catch(e){}return {v:1,lang:guessLang(),profile:defaultProfile(),subjects:[],status:{},built:false}}
-function save(){try{localStorage.setItem('planner.v1',JSON.stringify(S))}catch(e){}}
+function fresh(){return {v:1,lang:guessLang(),theme:'auto',profile:defaultProfile(),subjects:[],status:{},notes:{},moves:{},mini:{},reflect:{},videoLang:'app',lastBackup:'',builtAt:'',snooze:'',built:false,hideInstall:false}}
+function norm(j){const f=fresh();const o={...f,...j};o.profile={...f.profile,...(j.profile||{})};['busy','pauses','seasons'].forEach(k=>{if(!Array.isArray(o.profile[k]))o.profile[k]=[]});o.status=o.status||{};o.notes=o.notes||{};['moves','mini','reflect'].forEach(k=>{o[k]=o[k]||{}});return o}
+function load(){try{const j=JSON.parse(localStorage.getItem('planny.v1'));if(j&&j.v===1&&j.profile)return norm(j)}catch(e){}return fresh()}
+function save(){try{localStorage.setItem('planny.v1',JSON.stringify(S))}catch(e){}}
 function t(k,v){let s=(T[S.lang]&&T[S.lang][k])||T.en[k]||k;if(v)for(const x in v)s=s.split('{'+x+'}').join(v[x]);return s}
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const secOf=id=>SECTIONS.find(x=>x.id===id)||SECTIONS[7];
-function getPlan(){const subs=S.subjects.map(resolveSubject);return {subs,...buildPlan(S.profile,subs)}}
+const secOf=id=>SECTIONS.find(x=>x.id===id)||SECTIONS[SECTIONS.length-1];
+function nowMin(){const d=new Date();return d.getHours()*60+d.getMinutes()}
+function getPlan(){const subs=S.subjects.map(r=>withPace(resolveSubject(r),S.profile.pace));return {subs,...buildPlan(S.profile,subs,{today:todayISO(),status:S.status,moves:S.moves,mini:S.mini})}}
 function toast(m){const el=document.getElementById('toast');el.textContent=m;el.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('on'),3200)}
-function copyText(txt){try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).catch(()=>{})}}catch(e){}}
+function copyText(txt){
+  try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).catch(()=>fb())}else fb()}catch(e){fb()}
+  function fb(){try{const a=document.createElement('textarea');a.value=txt;a.style.position='fixed';a.style.opacity='0';document.body.appendChild(a);a.select();document.execCommand('copy');a.remove()}catch(e){}}
+}
+function applyTheme(){const r=document.documentElement;if(S.theme==='auto')r.removeAttribute('data-theme');else r.setAttribute('data-theme',S.theme)}
 function evTitle(e){
   const L=S.lang,s=e.sub;
   if(e.review)return t('review');
-  if(e.pages){const a=e.pages[0],b=e.pages[1];return t(s.kind==='quran'?'memorize':'readp',{a,b})}
-  if(e.topics){let x=e.topics.map(o=>pick(o,L)).join(' + ');if(e.part)x+=' ('+t('part',{i:e.part[0],n:e.part[1]})+')';return x}
+  if(e.pages)return t(s.kind==='quran'?'memorize':'readp',{a:e.pages[0],b:e.pages[1]});
+  if(e.topics&&e.topics.length){let x=e.topics.map(o=>pick(o,L)).join(' + ');if(e.part)x+=' ('+t('part',{i:e.part[0],n:e.part[1]})+')';return x}
   return t('session',{k:e.k+1});
 }
 function ytLink(name){return 'https://www.youtube.com/results?search_query='+encodeURIComponent(name+' exercise form')}
+function vidLang(){return S.videoLang==='en'?'en':S.videoLang==='ar'?'ar':S.lang}
+function videoQuery(e){
+  const s=e.sub,L=vidLang();if(['quran','qread','habit','workout'].includes(s.kind))return '';
+  const tp=(e.review?(e.weekTopics||[]):(e.topics||[])).slice(0,2).map(o=>pick(o,L)).join(' ');
+  return pick(s.name,L)+' '+tp+' '+(L==='ar'?'شرح':'tutorial');
+}
+function safeUrl(u){u=String(u||'').trim();return /^https?:\/\//i.test(u)?u:''}
+function quizPrompt(e){
+  const L=S.lang,tp=(e.weekTopics||e.topics||[]).map(o=>pick(o,L)).join('; '),nm=pick(e.sub.name,L);
+  return L==='ar'?'اختبرني في المواضيع دي من مادة '+nm+' اللي ذاكرتها الأسبوع ده: '+tp+'. اسألني سؤال واحد في كل مرة، استنى إجابتي، قولي لو صح أو غلط، اشرح أخطائي باختصار، وبعدين كمّل. في الآخر اديني نتيجة وإيه اللي أراجعه.':'Quiz me on these topics from my '+nm+' course this week: '+tp+'. Ask one question at a time, wait for my answer, tell me if I am right, explain mistakes briefly, then continue. Finish with a score and what to revisit.';
+}
 function evDetails(e){
   const L=S.lang,s=e.sub;let h='';
   if(e.reviewPages)h+='<p class="note">'+esc(t('revPages',{a:e.reviewPages[0],b:e.reviewPages[1]}))+'</p>';
-  const steps=stepsFor(s,e,L);
-  h+='<ol class="steps">'+steps.map(x=>'<li>'+esc(x.text)+' <span class="mn">'+fmtDur(x.min,L)+'</span></li>').join('')+'</ol>';
-  if(s.kind==='workout'&&e.topics&&e.topics[0].ex){
+  if(e.recap&&0){}
+  h+='<ol class="steps">'+stepsFor(s,e,L).map(x=>'<li>'+esc(x.text)+' <span class="mn">'+fmtDur(x.min,L)+'</span></li>').join('')+'</ol>';
+  if(s.kind==='workout'&&e.topics&&e.topics[0]&&e.topics[0].ex){
     h+='<p class="sub">'+esc(t('exTitle'))+'</p><ul class="ex">'+e.topics[0].ex.map(x=>'<li><span>'+esc(L==='ar'?x[1]:x[0])+'</span><b>'+esc(x[2])+'</b><a href="'+ytLink(x[0])+'" target="_blank" rel="noopener" aria-label="video">▶</a></li>').join('')+'</ul>';
   }else if(e.topics&&e.topics.length>1){h+='<ul class="tl">'+e.topics.map(o=>'<li>'+esc(pick(o,L))+'</li>').join('')+'</ul>'}
-  return h;
-}
-function evCard(e){
-  const L=S.lang,sec=secOf(e.sub.sec),st=S.status[e.key]||'',dur=e.end-e.start;
-  const mk=(v,lab,sym)=>'<button class="mk mk-'+v+'" data-act="mark" data-k="'+esc(e.key)+'" data-v="'+v+'" aria-pressed="'+(st===v)+'" aria-label="'+esc(lab)+'" title="'+esc(lab)+'">'+sym+'</button>';
-  return '<article class="ev'+(st?' st-'+st:'')+'" style="--sc:'+sec.color+'"><div class="tm"><b>'+fmtTime(e.start,L)+'</b><span>'+fmtTime(e.end,L)+'</span><i>'+fmtDur(dur,L)+'</i></div><div class="bd"><div class="sn">'+esc(pick(e.sub.name,L))+'</div><div class="tt">'+esc(evTitle(e))+'</div><details><summary>'+t('details')+'</summary>'+evDetails(e)+'</details></div><div class="mks">'+mk('d',t('done'),'✔')+mk('h',t('half'),'½')+mk('n',t('no'),'✘')+'</div></article>';
-}
-function vToday(P){
-  const L=S.lang,today=todayISO(),first=P.days[0].iso,last=P.days[P.days.length-1].iso;
-  if(!selDate)selDate=today<first?first:today>last?last:today;
-  const day=P.days.find(d=>d.iso===selDate);
-  let h='<div class="daynav"><button data-act="day" data-d="-1" aria-label="prev">‹</button><div><h2>'+DAYS[L][dow(selDate)]+' · '+fmtDate(selDate,L)+'</h2>';
-  h+='<p>'+(day?t('dayOf',{i:day.i+1,n:P.days.length,w:day.week}):t('ended'))+'</p></div><button data-act="day" data-d="1" aria-label="next">›</button></div>';
-  if(selDate!==today)h+='<button class="link" data-act="gotoday">'+t('today')+'</button>';
-  if(today<first)h+='<p class="banner">'+t('notStarted',{d:fmtDate(first,L)})+'</p>';
-  if(day){
-    const evs=day.events,dn=evs.filter(e=>S.status[e.key]==='d').length;
-    if(evs.length)h+='<div class="dprog"><div class="bar"><i style="width:'+Math.round(dn/evs.length*100)+'%"></i></div><span>'+t('dayDone',{a:dn,b:evs.length})+'</span></div>';
-    if(day.work)h+='<div class="work">'+t('work')+' · '+fmtTime(toMin(S.profile.workStart),L)+' – '+fmtTime(toMin(S.profile.workEnd),L)+' ('+t('commute')+')</div>';
-    if(day.rest)h+='<div class="work">'+t('restDay')+'</div>';
-    if(!evs.length)h+='<p class="empty">'+t('noEvents')+'</p>';
-    h+=evs.map(evCard).join('');
+  const vq=videoQuery(e),cl=safeUrl(s.link);
+  if(vq||cl){h+='<p class="sub">'+t('videos')+'</p><div class="row wrap">'+(cl?'<a class="btn" href="'+esc(cl)+'" target="_blank" rel="noopener">▶ '+t('course')+'</a>':'')+(vq?'<a class="btn" href="https://www.youtube.com/results?search_query='+encodeURIComponent(vq)+'" target="_blank" rel="noopener">▶ '+t('yt')+'</a>':'')+'</div>'}
+  if(e.review&&e.weekTopics&&e.weekTopics.length&&['study','lang'].includes(s.kind)){
+    const q=quizPrompt(e),eq=encodeURIComponent(q),a=(u,l)=>'<a class="btn" href="'+u+'" target="_blank" rel="noopener" data-act="copyq" data-q="'+esc(q)+'">'+l+'</a>';
+    h+='<p class="sub">'+t('quizT')+'</p><div class="row wrap">'+a('https://chatgpt.com/?q='+eq,t('openGPT'))+a('https://claude.ai/new?q='+eq,t('openClaude'))+a('https://gemini.google.com/app',t('openGem'))+'</div><p class="note">'+t('quizNote')+'</p>';
+  }
+  h+='<label class="fl2">'+t('notes')+'<textarea rows="2" data-note="'+esc(e.key)+'">'+esc(S.notes[e.key]||'')+'</textarea></label>';
+  h+='<div class="row wrap">';
+  if(!e.review)h+='<button class="ghost" data-act="mini" data-k="'+esc(e.key)+'">'+(S.mini[e.key]?t('miniOff'):t('miniOn'))+'</button>';
+  h+='<button class="ghost" data-act="movebtn" data-k="'+esc(e.key)+'">'+t('move')+'</button></div>';
+  if(movingKey===e.key){
+    const mv=S.moves[e.key]||{iso:e.iso,start:e.start},hh=pad(Math.floor(mv.start/60))+':'+pad(mv.start%60);
+    h+='<div class="bz"><p class="note">'+t('moveTo')+'</p><div class="grid"><label>'+t('from')+'<input type="date" id="mv_d" value="'+mv.iso+'"></label><label>&nbsp;<input type="time" id="mv_t" value="'+hh+'"></label></div><div class="row wrap"><button class="primary sm" data-act="movesave" data-k="'+esc(e.key)+'">'+t('moveSave')+'</button>'+(S.moves[e.key]?'<button class="ghost" data-act="moveunset" data-k="'+esc(e.key)+'">'+t('moveReset')+'</button>':'')+'</div></div>';
   }
   return h;
 }
+function evCard(e,isToday){
+  const L=S.lang,sec=secOf(e.sub.sec),st=S.status[e.key]||'',dur=e.end-e.start;
+  const past=isToday&&e.end<=nowMin()&&!st;
+  const mk=(v,lab,sym)=>'<button class="mk mk-'+v+'" data-act="mark" data-k="'+esc(e.key)+'" data-v="'+v+'" aria-pressed="'+(st===v)+'" aria-label="'+esc(lab)+'" title="'+esc(lab)+'">'+sym+'</button>';
+  return '<article class="ev'+(st?' st-'+st:'')+(e.missed&&!st?' is-missed':'')+(past?' past':'')+'" style="--sc:'+sec.color+'"><div class="tm"><b>'+fmtTime(e.start,L)+'</b><span>'+fmtTime(e.end,L)+'</span><i>'+fmtDur(dur,L)+'</i></div><div class="bd"><div class="sn">'+icon(e.sub.sec)+'<span>'+esc(pick(e.sub.name,L))+'</span>'+(e.missed&&!st?'<em class="badge">'+t('missed')+'</em>':'')+(e.moved?'<em class="badge">'+t('movedB')+'</em>':'')+(e.short?'<em class="badge">'+t('shortB')+'</em>':'')+'</div><div class="tt">'+esc(evTitle(e))+'</div><details class="evd" data-k="'+esc(e.key)+'"'+(EVOPEN.has(e.key)||movingKey===e.key?' open':'')+'><summary>'+t('details')+'</summary>'+evDetails(e)+'</details></div><div class="mks">'+mk('d',t('done'),'✔')+mk('h',t('half'),'½')+mk('n',t('no'),'✘')+'<button class="mk tmr" data-act="timer" data-k="'+esc(e.key)+'" aria-label="'+esc(t('startTimer'))+'" title="'+esc(t('startTimer'))+'">⏱</button></div></article>';
+}
+function nextHtml(day){
+  if(!day)return '';
+  const L=S.lang,evs=day.events,n=nowMin();
+  const open=evs.filter(e=>S.status[e.key]!=='d');
+  if(!evs.length)return '';
+  if(!open.length)return '<div class="hero ok"><p>'+t('allDone')+'</p></div>';
+  const cur=open.find(e=>e.start<=n&&n<e.end),nx=cur||open.find(e=>e.start>n);
+  if(!nx)return '<div class="hero"><p>'+t('noMore')+'</p></div>';
+  const x=cur?fmtDur(nx.end-n,L):fmtDur(nx.start-n,L);
+  const sec=secOf(nx.sub.sec);
+  return '<div class="hero" style="--sc:'+sec.color+'"><div class="hl"><b>'+(cur?t('nowL'):t('nextL'))+'</b><span>'+(cur?t('leftT',{x}):t('inT',{x}))+'</span></div><div class="ht">'+esc(pick(nx.sub.name,L))+' · '+esc(evTitle(nx))+'</div><div class="hs">'+fmtTime(nx.start,L)+' – '+fmtTime(nx.end,L)+'</div><div class="row wrap"><button class="primary sm" data-act="timer" data-k="'+esc(nx.key)+'">⏱ '+t('startTimer')+'</button><button class="ghost" data-act="mark" data-k="'+esc(nx.key)+'" data-v="d">✔ '+t('done')+'</button></div></div>';
+}
+let curDay=null;
+function installBanner(){
+  if(S.hideInstall||isStandalone())return '';
+  return '<div class="banner inst"><div><b>'+t('install')+'</b><p>'+t('installBody')+'</p></div><div class="row wrap">'+(deferred?'<button class="ghost" data-act="doinstall">'+t('installBtn')+'</button>':'<button class="ghost" data-act="howinstall">'+t('installHow')+'</button>')+'<button class="link" data-act="hideinstall">'+t('later')+'</button></div></div>';
+}
+function daysBetween(a,b){return Math.round((new Date(b)-new Date(a))/864e5)}
+function backupBanner(){
+  if(!S.built)return '';
+  const ref=[S.lastBackup||S.builtAt,S.snooze].filter(Boolean).sort().pop();if(!ref)return '';
+  if(daysBetween(ref,todayISO())<14)return '';
+  return '<div class="banner inst"><div><b>'+t('backup')+'</b><p>'+t('bkRem')+'</p></div><div class="row wrap"><button class="ghost" data-act="dlbackup">'+t('bkNow')+'</button><button class="link" data-act="snooze">'+t('later')+'</button></div></div>';
+}
+function isStandalone(){try{return window.matchMedia('(display-mode: standalone)').matches||navigator.standalone===true}catch(e){return false}}
+function vToday(P){
+  const L=S.lang,today=todayISO(),first=P.days[0].iso,last=P.days[P.days.length-1].iso;
+  if(!selDate)selDate=today<first?first:today>last?last:today;
+  const day=P.days.find(d=>d.iso===selDate);curDay=day;
+  const isToday=selDate===today;
+  let h='<div class="daynav"><button data-act="day" data-d="-1" aria-label="prev">‹</button><div><h2>'+DAYS[L][dow(selDate)]+' · '+fmtDate(selDate,L)+'</h2>';
+  h+='<p>'+(day?t('dayOf',{i:day.i+1,n:P.days.length,w:day.week}):t('ended'))+'</p></div><button data-act="day" data-d="1" aria-label="next">›</button></div>';
+  if(!isToday)h+='<button class="link" data-act="gotoday">'+t('today')+'</button>';
+  if(today<first)h+='<p class="banner">'+t('notStarted',{d:fmtDate(first,L)})+'</p>';
+  if(P.missed>0&&isToday)h+='<p class="banner warn">'+t('missedBanner',{n:P.missed})+'</p>';
+  if(isToday)h+=backupBanner()+installBanner();
+  if(day){
+    const evs=day.events,dn=evs.filter(e=>S.status[e.key]==='d').length;
+    if(isToday)h+='<div id="next">'+nextHtml(day)+'</div>';
+    if(evs.length)h+='<div class="dprog"><div class="bar"><i style="width:'+Math.round(dn/evs.length*100)+'%"></i></div><span>'+t('dayDone',{a:dn,b:evs.length})+'</span></div>';
+    if(day.work)h+='<div class="work">'+t('work')+' · '+fmtTime(toMin(day.ep.workStart),L)+' – '+fmtTime(toMin(day.ep.workEnd),L)+' ('+t('commute')+')</div>';
+    if(day.rest)h+='<div class="work">'+t('restDay')+'</div>';
+    if(day.paused)h+='<div class="work">'+t('pausedDay')+'</div>';
+    if(!evs.length&&!day.paused)h+='<p class="empty">'+t('noEvents')+'</p>';
+    h+=evs.map(e=>evCard(e,isToday)).join('');
+    if(evs.length)h+='<div class="row wrap"><button class="ghost" data-act="copyday">'+t('copyDay')+'</button></div>';
+    if(isToday&&evs.some(e=>S.status[e.key]!=='d'&&e.end>nowMin()))h+='<section class="card"><h3>'+t('late')+'</h3><div class="row wrap"><label class="mini">'+t('lateQ')+'<select id="latesel">'+[[30,'min30'],[60,'min60'],[90,'min90'],[120,'min120']].map(o=>'<option value="'+o[0]+'">'+t(o[1])+'</option>').join('')+'</select></label><button class="ghost" data-act="late">'+t('lateGo')+'</button></div></section>';
+  }
+  return h;
+}
+function icsEsc(s){return String(s).replace(/\\/g,'\\\\').replace(/;/g,'\;').replace(/,/g,'\\,').replace(/\r?\n/g,'\\n')}
+function makeICS(P,range){
+  const today=todayISO(),end=range==='7'?addDays(today,6):range==='30'?addDays(today,29):'9999-12-31';
+  const L=[ 'BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Planny//EN','CALSCALE:GREGORIAN'];let n=0;
+  const stamp=new Date().toISOString().replace(/[-:]/g,'').replace(/\.\d+/,'');
+  P.days.forEach(d=>{if(d.iso<today||d.iso>end)return;d.events.forEach(e=>{
+    if(S.status[e.key]==='d')return;n++;
+    const ds=d.iso.replace(/-/g,''),f=m=>pad(Math.floor(m/60))+pad(m%60)+'00';
+    L.push('BEGIN:VEVENT','UID:'+e.key.replace(/[^\w|-]/g,'')+'@planny','DTSTAMP:'+stamp,'DTSTART:'+ds+'T'+f(e.start),'DTEND:'+ds+'T'+f(e.end),'SUMMARY:'+icsEsc(pick(e.sub.name,S.lang)+': '+evTitle(e)),'BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:Planny','TRIGGER:-PT10M','END:VALARM','END:VEVENT');
+  })});
+  L.push('END:VCALENDAR');return {text:L.join('\r\n'),n};
+}
+let calRange='7';
 function vPlan(P){
   const L=S.lang,today=todayISO();let h='';
   const curW=(P.days.find(d=>d.iso===today)||{week:1}).week;
@@ -411,9 +640,17 @@ function vPlan(P){
   h+=P.days.filter(d=>d.week===window._pw).map(d=>{
     const dn=d.events.filter(e=>S.status[e.key]==='d').length;
     const subs=[...new Set(d.events.map(e=>e.sub.id))].map(id=>{const s=P.subs.find(x=>x.id===id);return '<i style="background:'+secOf(s.sec).color+'" title="'+esc(pick(s.name,L))+'"></i>'}).join('');
-    return '<button class="prow'+(d.iso===today?' now':'')+'" data-act="openday" data-d="'+d.iso+'"><span class="pd"><b>'+DAYS[L][d.dow]+'</b><small>'+fmtDate(d.iso,L)+'</small></span><span class="dots">'+subs+'</span><span class="pc">'+(d.rest&&!d.events.length?t('restDay'):t('acts',{a:dn,b:d.events.length}))+'</span></button>';
+    const txt=d.paused?t('pausedDay'):(d.rest&&!d.events.length?t('restDay'):t('acts',{a:dn,b:d.events.length}));
+    return '<button class="prow'+(d.iso===today?' now':'')+'" data-act="openday" data-d="'+d.iso+'"><span class="pd"><b>'+DAYS[L][d.dow]+'</b><small>'+fmtDate(d.iso,L)+'</small></span><span class="dots">'+subs+'</span><span class="pc">'+txt+'</span></button>';
   }).join('');
+  h+='<section class="card"><h3>'+t('calTitle')+'</h3><div class="row wrap"><label class="mini">'+t('calRange')+'<select id="calr">'+[['7','cal7'],['30','cal30'],['all','calAll']].map(o=>'<option value="'+o[0]+'"'+(calRange===o[0]?' selected':'')+'>'+t(o[1])+'</option>').join('')+'</select></label><button class="ghost" data-act="ics">'+t('calBtn')+'</button></div><p class="note">'+t('calNote')+'</p></section>';
   return h;
+}
+function weekStats(P,w,today){
+  const ev=[];P.days.forEach(d=>{if(d.week===w)d.events.forEach(e=>{if(e.iso<=today)ev.push(e)})});
+  const dn=ev.filter(e=>S.status[e.key]==='d').length;
+  const by={};ev.forEach(e=>{const o=by[e.sid]=by[e.sid]||{s:e.sub,a:0,b:0};o.b++;if(S.status[e.key]==='d')o.a++});
+  return {ev,dn,by:Object.values(by)};
 }
 function vProgress(P){
   const L=S.lang,today=todayISO();
@@ -424,21 +661,57 @@ function vProgress(P){
     if(i>=0){const has=d=>d.events.some(e=>S.status[e.key]==='d');if(!has(P.days[i]))i--;while(i>=0&&has(P.days[i])){streak++;i--}}}
   const left=Math.max(0,Math.round((new Date(P.days[P.days.length-1].iso)-new Date(today))/864e5));
   let h='<div class="tiles"><div><b>'+rate+'%</b><span>'+t('rate')+'</span></div><div><b>'+dn+'</b><span>'+t('doneAll')+'</span></div><div><b>'+streak+'</b><span>'+t('streak')+'</span></div><div><b>'+left+'</b><span>'+t('daysLeft')+'</span></div></div><p class="note">'+t('elapsedNote')+'</p>';
-  h+='<h3>'+t('byWeek')+'</h3><div class="wbars">';
-  for(let w=1;w<=S.profile.weeks;w++){const ev=all.filter(e=>e.week===w&&e.iso<=today),d=ev.filter(e=>S.status[e.key]==='d').length,p=ev.length?Math.round(d/ev.length*100):0;
-    h+='<div class="wb" title="'+p+'%"><div><i style="height:'+p+'%"></i></div><small>'+w+'</small></div>'}
-  h+='</div><h3>'+t('bySubject')+'</h3>';
+  // weekly summary
+  const cd=P.days.find(d=>d.iso===today);const cw=cd?cd.week:(today>P.days[P.days.length-1].iso?S.profile.weeks:1);
+  const sw=cw>1?cw-1:cw,ws=weekStats(P,sw,today);
+  if(ws.ev.length){
+    const p=Math.round(ws.dn/ws.ev.length*100);
+    const rated=ws.by.filter(x=>x.b>=2).map(x=>({s:x.s,r:x.a/x.b})).sort((a,b)=>b.r-a.r);
+    h+='<section class="card sum"><h3>'+(cw>1?t('wsLast'):t('wsThis'))+' · '+t('week',{w:sw})+'</h3><p>'+t('wsLine',{a:ws.dn,b:ws.ev.length,p})+'</p>';
+    if(rated.length>1){h+='<p class="note">'+t('wsBest',{s:esc(pick(rated[0].s.name,L))})+' '+t('wsWeak',{s:esc(pick(rated[rated.length-1].s.name,L))})+'</p>'}
+    h+='<p><b>'+(p>=80?t('wsGood'):p>=50?t('wsMid'):t('wsLow'))+'</b></p></section>';
+  }
+  // chart
+  h+='<h3>'+t('byWeek')+'</h3><div class="chart"><div class="yax"><span>100%</span><span>50%</span><span>0</span></div><div class="plot">';
+  for(let w=1;w<=S.profile.weeks;w++){const s=weekStats(P,w,today),pp=s.ev.length?Math.round(s.dn/s.ev.length*100):0;
+    h+='<div class="wb'+(w===cw?' cur':'')+'" title="'+t('week',{w})+': '+pp+'%"><em>'+(s.ev.length?pp:'')+'</em><div><i style="height:'+pp+'%"></i></div><small>'+w+'</small></div>'}
+  h+='</div></div>';
+  // heat
+  h+='<h3>'+t('heat')+'</h3><div class="heat">'+P.days.map(d=>{
+    const e=d.events,done=e.filter(x=>S.status[x.key]==='d').length,r=e.length?done/e.length:null;
+    const cls=d.iso>today?'fut':r===null?'none':'';
+    return '<i class="'+cls+'" style="'+(r!==null&&d.iso<=today?'--a:'+(0.12+0.88*r).toFixed(2):'')+'" title="'+d.iso+(r!==null?' · '+Math.round(r*100)+'%':'')+'"></i>'}).join('')+'</div>';
+  // badges
+  const perfect=(()=>{for(let w=1;w<=S.profile.weeks;w++){const a=[];P.days.forEach(d=>{if(d.week===w)d.events.forEach(e=>a.push(e))});if(a.length>=3&&a.every(e=>e.iso<=today&&S.status[e.key]==='d'))return true}return false})();
+  const BG=[['bg_s3',streak>=3],['bg_s7',streak>=7],['bg_s14',streak>=14],['bg_s30',streak>=30],['bg_d10',dn>=10],['bg_d50',dn>=50],['bg_d100',dn>=100],['bg_pw',perfect]];
+  h+='<h3>'+t('badgesT')+'</h3><div class="badges">'+BG.map(b=>'<span class="bdg'+(b[1]?' on':'')+'">'+(b[1]?'★ ':'☆ ')+t(b[0])+'</span>').join('')+'</div>';
+  // weekly challenge
+  {const wk=P.days.filter(d=>d.week===cw),wEv=[];wk.forEach(d=>d.events.forEach(e=>wEv.push(e)));
+   const prev=weekStats(P,cw>1?cw-1:cw,today).by.filter(x=>x.b>=1).sort((a,b)=>a.a/a.b-b.a/b.b);
+   const tgt=(prev[0]&&wEv.some(e=>e.sid===prev[0].s.id)?prev[0].s:(wEv[0]&&wEv[0].sub));
+   if(tgt){const se=wEv.filter(e=>e.sid===tgt.id),a=se.filter(e=>S.status[e.key]==='d').length;
+     h+='<section class="card"><h3>'+t('chalT')+'</h3><p>'+t('chalLine',{s:esc(pick(tgt.name,L))})+'</p><div class="bar"><i style="width:'+Math.round(a/se.length*100)+'%"></i></div><p class="note">'+(a===se.length?'★ '+t('chalWon'):t('chalProg',{a,b:se.length}))+'</p></section>'}
+   h+='<section class="card"><h3>'+t('refT')+' · '+t('week',{w:cw})+'</h3><textarea rows="2" data-ref="'+cw+'" placeholder="'+esc(t('refPh'))+'">'+esc(S.reflect[cw]||'')+'</textarea></section>';}
+  // course map
+  h+='<h3>'+t('cmapT')+'</h3>';
+  P.subs.filter(s=>s.topics&&s.topics.length&&!['quran','qread','habit','workout'].includes(s.kind)).forEach(sb=>{
+    const rank={d:2,h:1},best={};
+    all.forEach(e=>{if(e.sid!==sb.id||e.review||!e.topics)return;const v=rank[S.status[e.key]]||0;e.topics.forEach(o=>{const k=pick(o,'en')+'|'+pick(o,'ar');if(best[k]===undefined||v>best[k])best[k]=v})});
+    const rows=sb.topics.map(o=>({o,v:best[pick(o,'en')+'|'+pick(o,'ar')]||0})),dn2=rows.filter(r=>r.v===2).length,pc=Math.round(dn2/rows.length*100);
+    h+='<details class="cmap" style="--sc:'+secOf(sb.sec).color+'"><summary>'+icon(sb.sec)+'<span>'+esc(pick(sb.name,L))+'</span><b>'+pc+'%</b></summary><div class="bar"><i style="width:'+pc+'%"></i></div><p class="note">'+t('cmapOf',{a:dn2,b:rows.length})+'</p><ul class="cm">'+rows.map(r=>'<li class="v'+r.v+'"><i>'+(r.v===2?'✔':r.v===1?'½':'○')+'</i>'+esc(pick(r.o,L))+'</li>').join('')+'</ul></details>'});
+  h+='<h3>'+t('bySubject')+'</h3>';
   h+=P.subs.map(s=>{const ev=el.filter(e=>e.sid===s.id),d=ev.filter(e=>S.status[e.key]==='d').length,p=ev.length?Math.round(d/ev.length*100):0;
-    return '<div class="srow" style="--sc:'+secOf(s.sec).color+'"><span>'+esc(pick(s.name,L))+'</span><div class="bar"><i style="width:'+p+'%"></i></div><b>'+d+'/'+ev.length+'</b></div>'}).join('');
+    return '<div class="srow" style="--sc:'+secOf(s.sec).color+'"><span>'+icon(s.sec)+esc(pick(s.name,L))+'</span><div class="bar"><i style="width:'+p+'%"></i></div><b>'+d+'/'+ev.length+'</b></div>'}).join('');
   return h;
 }
 const DUR=[15,20,30,40,45,60,90];
 function selHtml(opts,val,attrs,lab){return '<select '+attrs+' aria-label="'+esc(lab)+'">'+opts.map(o=>'<option value="'+o[0]+'"'+(String(o[0])===String(val)?' selected':'')+'>'+o[1]+'</option>').join('')+'</select>'}
-function vSetup(){
-  const L=S.lang,p=S.profile;
-  const dayCbs=(name,arr)=>'<div class="dcb">'+[0,1,2,3,4,5,6].map(d=>'<label><input type="checkbox" data-f="'+name+'" value="'+d+'"'+(arr.includes(d)?' checked':'')+'><span>'+DAYS[L][d].slice(0,L==='ar'?3:3)+'</span></label>').join('')+'</div>';
-  let h='<h2>'+t('s_title')+'</h2><p class="lead">'+t('s_intro')+'</p>';
-  h+='<section class="card"><h3>'+t('s_sched')+'</h3><div class="grid">';
+function dayCbs(name,arr,extra){const L=S.lang;return '<div class="dcb">'+[0,1,2,3,4,5,6].map(d=>'<label><input type="checkbox" '+(extra||'data-f="'+name+'"')+' value="'+d+'"'+(arr.includes(d)?' checked':'')+'><span>'+DAYS[L][d].slice(0,3)+'</span></label>').join('')+'</div>'}
+function stepper(){return '<ol class="stepper">'+[1,2,3].map(i=>'<li class="'+(i===wz?'on':i<wz?'dn':'')+'"><span>'+i+'</span>'+t('st'+i)+'</li>').join('')+'</ol>'}
+function navBtns(){return '<div class="wnav">'+(wz>1?'<button class="ghost" data-act="wback">'+t('back')+'</button>':'<span></span>')+(wz<3?'<button class="primary sm" data-act="wnext">'+t('next')+'</button>':'')+'</div>'}
+function step1(){
+  const p=S.profile;
+  let h='<h2>'+t('s_title1')+'</h2><p class="lead">'+t('s_intro1')+'</p><section class="card"><div class="grid">';
   h+='<label>'+t('startDate')+'<input type="date" data-f="start" value="'+p.start+'"></label>';
   h+='<label>'+t('weeks')+'<input type="number" min="4" max="26" data-f="weeks" value="'+p.weeks+'"></label>';
   h+='<label>'+t('wake')+'<input type="time" data-f="wake" value="'+p.wake+'"></label>';
@@ -448,42 +721,70 @@ function vSetup(){
   h+='<label>'+t('commuteL')+'<input type="number" min="0" max="180" step="5" data-f="commute" value="'+p.commute+'"></label>';
   h+='<label>'+t('windL')+'<input type="number" min="0" max="240" step="5" data-f="windDown" value="'+p.windDown+'"></label></div>';
   h+='<p class="fl">'+t('workDays')+'</p>'+dayCbs('workDays',p.workDays)+'<p class="fl">'+t('restDays')+'</p>'+dayCbs('restDays',p.restDays)+'</section>';
-  h+='<section class="card"><h3>'+t('s_subj')+'</h3>';
+  h+='<section class="card"><h3>'+t('busyT')+'</h3><p class="note">'+t('busyIntro')+'</p>';
+  p.busy.forEach((b,i)=>{h+='<div class="bz"><label>'+t('busyName')+'<input type="text" data-bz="'+i+'|name" value="'+esc(b.name||'')+'"></label><div class="grid"><label>'+t('from')+'<input type="time" data-bz="'+i+'|start" value="'+b.start+'"></label><label>'+t('to')+'<input type="time" data-bz="'+i+'|end" value="'+b.end+'"></label></div>'+dayCbs('',b.days,'data-bzd="'+i+'"')+'<button class="link" data-act="rmbusy" data-i="'+i+'">'+t('remove')+'</button></div>'});
+  h+='<button class="ghost" data-act="addbusy">'+t('busyAdd')+'</button></section>';
+  h+='<section class="card"><h3>'+t('pauseT')+'</h3><p class="note">'+t('pauseIntro')+'</p>';
+  p.pauses.forEach((b,i)=>{h+='<div class="bz"><div class="grid"><label>'+t('from')+'<input type="date" data-pz="'+i+'|from" value="'+b.from+'"></label><label>'+t('to')+'<input type="date" data-pz="'+i+'|to" value="'+b.to+'"></label></div><button class="link" data-act="rmpause" data-i="'+i+'">'+t('remove')+'</button></div>'});
+  h+='<button class="ghost" data-act="addpause">'+t('pauseAdd')+'</button></section>';
+  h+='<section class="card"><h3>'+t('seasonT')+'</h3><p class="note">'+t('seasonIntro')+'</p>';
+  p.seasons.forEach((z,i)=>{const ti=(k,l)=>'<label>'+l+'<input type="time" data-sz="'+i+'|'+k+'" value="'+(z[k]||p[k])+'"></label>';
+    h+='<div class="bz"><div class="grid"><label>'+t('from')+'<input type="date" data-sz="'+i+'|from" value="'+z.from+'"></label><label>'+t('to')+'<input type="date" data-sz="'+i+'|to" value="'+z.to+'"></label>'+ti('wake',t('wake'))+ti('sleep',t('sleepT'))+ti('workStart',t('workStart'))+ti('workEnd',t('workEnd'))+'<label>'+t('commuteL')+'<input type="number" min="0" max="180" step="5" data-sz="'+i+'|commute" value="'+(z.commute!==undefined&&z.commute!==''?z.commute:p.commute)+'"></label></div><button class="link" data-act="rmseason" data-i="'+i+'">'+t('remove')+'</button></div>'});
+  h+='<button class="ghost" data-act="addseason">'+t('seasonAdd')+'</button></section>';
+  return h;
+}
+function step2(){
+  const L=S.lang;
+  let h='<h2>'+t('s_title2')+'</h2><p class="lead">'+t('s_intro2')+'</p><section class="card"><h3>'+t('quick')+'</h3><div class="tpls">'+TEMPLATES.map(x=>'<button class="chip wide" data-act="tpl" data-id="'+x.id+'">'+esc(pick(x,L))+'</button>').join('')+'</div></section><section class="card">';
   SECTIONS.forEach((sec,si)=>{
     const courses=LIB.filter(c=>c.sec===sec.id),customs=S.subjects.filter(r=>!r.cid&&sec.id==='custom');
     if(!courses.length&&!customs.length)return;
     const nsel=S.subjects.filter(r=>r.cid&&LIBMAP[r.cid].sec===sec.id).length+customs.length;
-    h+='<details class="sec" data-sid="'+sec.id+'"'+(OPEN.has(sec.id)||(!OPEN.touched&&(si===0||nsel))?' open':'')+' style="--sc:'+sec.color+'"><summary>'+esc(pick(sec,L))+(nsel?' <em>'+nsel+'</em>':'')+'</summary>';
+    h+='<details class="sec" data-sid="'+sec.id+'"'+(OPEN.has(sec.id)||(!OPEN.touched&&nsel)?' open':'')+' style="--sc:'+sec.color+'"><summary>'+icon(sec.id)+'<span>'+esc(pick(sec,L))+'</span>'+(nsel?' <em>'+nsel+'</em>':'')+'</summary>';
     courses.forEach(c=>{
       const rec=S.subjects.find(r=>r.cid===c.id);
       h+='<div class="crs'+(rec?' on':'')+'"><label class="ck"><input type="checkbox" data-act="subj" data-c="'+c.id+'"'+(rec?' checked':'')+'><span>'+esc(pick(c.name,L))+'</span></label>';
       if(rec){
         h+='<div class="ctl">'+selHtml([1,2,3,4,5,6,7].map(n=>[n,n+' × '+t('perWeek')]),rec.n,'data-act="rn" data-id="'+rec.id+'"',t('perWeek'))+selHtml(DUR.map(m=>[m,m+' '+t('mins')]),rec.m,'data-act="rm" data-id="'+rec.id+'"',t('mins'))+selHtml([['morning',t('morning')],['evening',t('evening')],['any',t('anySlot')]],rec.slot||c.slot,'data-act="rs" data-id="'+rec.id+'"',t('pickSlot'));
         if(c.kind==='quran'||c.kind==='qread')h+='<label class="mini">'+t('startPage')+'<input type="number" min="1" max="604" data-act="sp" data-id="'+rec.id+'" value="'+(rec.startPage||1)+'"></label><label class="mini">'+t('pagesPer')+'<input type="number" min="1" max="20" data-act="pg" data-id="'+rec.id+'" value="'+(rec.pages||(c.kind==='quran'?2:3))+'"></label>';
-        h+='</div>';
+        h+='</div><label class="mini lk">'+t('courseLink')+'<input type="url" inputmode="url" data-act="lk" data-id="'+rec.id+'" placeholder="'+esc(t('courseLinkPh'))+'" value="'+esc(rec.link||'')+'"></label>';
       }
       h+='</div>';
     });
     customs.forEach(r=>{
-      h+='<div class="crs on"><div class="ck"><span>'+esc(r.name)+' <em>'+t('custom')+' · '+r.topics.length+'</em></span><button class="link" data-act="rmc" data-id="'+r.id+'">'+t('remove')+'</button></div><div class="ctl">'+selHtml([1,2,3,4,5,6,7].map(n=>[n,n+' × '+t('perWeek')]),r.n,'data-act="rn" data-id="'+r.id+'"',t('perWeek'))+selHtml(DUR.map(m=>[m,m+' '+t('mins')]),r.m,'data-act="rm" data-id="'+r.id+'"',t('mins'))+'</div></div>';
+      h+='<div class="crs on"><div class="ck"><span>'+esc(r.name)+' <em>'+t('custom')+' · '+r.topics.length+'</em></span><button class="link" data-act="rmc" data-id="'+r.id+'">'+t('remove')+'</button></div><div class="ctl">'+selHtml([1,2,3,4,5,6,7].map(n=>[n,n+' × '+t('perWeek')]),r.n,'data-act="rn" data-id="'+r.id+'"',t('perWeek'))+selHtml(DUR.map(m=>[m,m+' '+t('mins')]),r.m,'data-act="rm" data-id="'+r.id+'"',t('mins'))+'</div><label class="mini lk">'+t('courseLink')+'<input type="url" inputmode="url" data-act="lk" data-id="'+r.id+'" placeholder="'+esc(t('courseLinkPh'))+'" value="'+esc(r.link||'')+'"></label></div>';
     });
     h+='</details>';
   });
-  h+='</section>'+customPanel();
-  h+=capBlock();
-  h+='<button class="primary" data-act="build"'+(S.subjects.length?'':' disabled')+'>'+(S.built?t('rebuild'):t('build'))+'</button>';
-  h+='<section class="card"><h3>'+t('backup')+'</h3><p class="note">'+t('backupNote')+'</p><div class="row"><button class="ghost" data-act="copybackup">'+t('copyBackup')+'</button></div><label class="fl2">'+t('restore')+'<textarea id="bk" rows="3"></textarea></label><div class="row"><button class="ghost" data-act="restore">'+t('restoreBtn')+'</button><button class="ghost danger" data-act="reset">'+t('reset')+'</button></div></section>';
-  return h;
+  return h+'</section>'+customPanel();
 }
 function capBlock(){
-  const subs=S.subjects.map(resolveSubject),d=weeklyDemand(subs),c=weeklyCapacity(S.profile),r=c?d/c:9;
+  const subs=S.subjects.map(r=>withPace(resolveSubject(r),S.profile.pace)),d=weeklyDemand(subs),c=weeklyCapacity(S.profile),r=c?d/c:9;
   const learn=subs.filter(s=>s.kind==='study'||s.kind==='lang').length;
   const cls=r>1?'bad':r>.8?'warn':'ok',msg=r>1?t('capOver'):r>.8?t('capTight'):t('capOk');
   return '<section class="card cap '+cls+'"><h3>'+t('cap')+'</h3><div class="bar"><i style="width:'+Math.min(100,Math.round(r*100))+'%"></i></div><p>'+t('capLine',{d:fmtDur(d,S.lang),c:fmtDur(c,S.lang)})+' <b>'+msg+'</b></p>'+(learn>3?'<p class="note">'+t('many',{n:learn})+'</p>':'')+'</section>';
 }
+function step3(){
+  const L=S.lang,p=S.profile;
+  let h='<h2>'+t('s_title3')+'</h2><p class="lead">'+t('s_intro3')+'</p>';
+  h+='<section class="card"><h3>'+t('yourSubj')+'</h3>';
+  if(!S.subjects.length)h+='<p class="note">'+t('noSubj')+'</p>';
+  else h+='<ul class="sl">'+S.subjects.map(r=>{const s=resolveSubject(r);return '<li style="--sc:'+secOf(s.sec).color+'">'+icon(s.sec)+'<span>'+esc(pick(s.name,L))+'</span><i>'+r.n+' × '+r.m+' '+t('mins')+'</i></li>'}).join('')+'</ul>';
+  h+='</section><section class="card"><h3>'+t('paceT')+'</h3><div class="seg">'+[['light','pLight','pLightD'],['standard','pStd','pStdD'],['intense','pInt','pIntD']].map(o=>'<label><input type="radio" name="pace" data-pace="'+o[0]+'"'+(p.pace===o[0]?' checked':'')+'><span><b>'+t(o[1])+'</b><small>'+t(o[2])+'</small></span></label>').join('')+'</div></section>';
+  h+=capBlock();
+  h+='<button class="primary" data-act="build"'+(S.subjects.length?'':' disabled')+'>'+(S.built?t('rebuild'):t('build'))+'</button>';
+  h+='<section class="card"><h3>'+t('videoLang')+'</h3><div class="seg">'+[['app','vlApp'],['en','vlEn'],['ar','vlAr']].map(o=>'<label><input type="radio" name="vl" data-vl="'+o[0]+'"'+(S.videoLang===o[0]?' checked':'')+'><span><b>'+t(o[1])+'</b></span></label>').join('')+'</div></section>';
+  h+='<section class="card"><h3>'+t('theme')+'</h3><div class="seg">'+[['auto','tAuto'],['light','tLight'],['dark','tDark']].map(o=>'<label><input type="radio" name="theme" data-theme="'+o[0]+'"'+(S.theme===o[0]?' checked':'')+'><span><b>'+t(o[1])+'</b></span></label>').join('')+'</div></section>';
+  h+='<section class="card"><h3>'+t('install')+'</h3><p class="note">'+t('installBody')+'</p><div class="row wrap">'+(deferred?'<button class="ghost" data-act="doinstall">'+t('installBtn')+'</button>':'')+'<button class="ghost" data-act="howinstall">'+t('installHow')+'</button></div></section>';
+  h+='<section class="card"><h3>'+t('backup')+'</h3><p class="note">'+t('backupNote')+'</p><div class="row wrap"><button class="ghost" data-act="copybackup">'+t('copyBackup')+'</button><button class="ghost" data-act="dlbackup">'+t('bkFile')+'</button></div><label class="fl2">'+t('bkLoad')+'<input type="file" accept=".json,application/json" id="bkfile"></label><label class="fl2">'+t('restore')+'<textarea id="bk" rows="3"></textarea></label><div class="row"><button class="ghost" data-act="restore">'+t('restoreBtn')+'</button><button class="ghost danger" data-act="reset">'+t('reset')+'</button></div></section>';
+  h+='<section class="card"><h3>'+t('shareT')+'</h3><p class="note">'+t('shareNote')+'</p><div class="row"><button class="ghost" data-act="sharecopy">'+t('shareCopy')+'</button></div><label class="fl2">'+t('shareIn')+'<textarea id="sh_in" rows="2"></textarea></label><div class="row"><button class="ghost" data-act="shareuse">'+t('shareUse')+'</button></div></section>';
+  if(FEEDBACK_URL)h+='<a class="btn" href="'+esc(FEEDBACK_URL)+'" target="_blank" rel="noopener">'+t('fbBtn')+'</a>';
+  return h;
+}
+function vSetup(){return stepper()+(wz===1?step1():wz===2?step2():step3())+navBtns()}
 function customPanel(){
-  const L=S.lang,topics=parseTopics(draft.paste);
-  const link=(u,l,cls)=>'<a class="btn '+cls+'" href="'+u+'" target="_blank" rel="noopener" data-act="copyprompt">'+l+'</a>';
+  const topics=parseTopics(draft.paste);
+  const link=(u,l)=>'<a class="btn" href="'+u+'" target="_blank" rel="noopener" data-act="copyprompt">'+l+'</a>';
   let h='<section class="card" id="cpanel"><h3>'+t('c_title')+'</h3><p class="note">'+t('c_intro')+'</p>';
   h+='<label class="fl2">'+t('c_name')+'<input type="text" id="d_name" value="'+esc(draft.name)+'"></label>';
   h+='<label class="fl2">'+t('c_goal')+'<textarea id="d_goal" rows="2" placeholder="'+esc(t('c_goalPh'))+'">'+esc(draft.goal)+'</textarea></label>';
@@ -491,37 +792,79 @@ function customPanel(){
   h+='<button class="ghost" data-act="mkprompt">'+t('mkPrompt')+'</button>';
   if(draft.prompt){
     const q=encodeURIComponent(draft.prompt);
-    h+='<p class="note">'+t('c_step2')+'</p><textarea id="d_prompt" rows="4" readonly>'+esc(draft.prompt)+'</textarea><div class="row wrap">'+link('https://chatgpt.com/?q='+q,t('openGPT'),'')+link('https://claude.ai/new?q='+q,t('openClaude'),'')+link('https://gemini.google.com/app',t('openGem'),'')+'<button class="ghost" data-act="copyprompt2">'+t('copyP')+'</button></div>';
+    h+='<p class="note">'+t('c_step2')+'</p><textarea id="d_prompt" rows="4" readonly>'+esc(draft.prompt)+'</textarea><div class="row wrap">'+link('https://chatgpt.com/?q='+q,t('openGPT'))+link('https://claude.ai/new?q='+q,t('openClaude'))+link('https://gemini.google.com/app',t('openGem'))+'<button class="ghost" data-act="copyprompt2">'+t('copyP')+'</button></div>';
   }
   h+='<label class="fl2">'+t('c_step3')+'<textarea id="d_paste" rows="6">'+esc(draft.paste)+'</textarea></label><div class="row"><button class="ghost" data-act="paste">'+t('pasteBtn')+'</button><span id="d_cnt" class="note">'+(topics.length?t('topicsFound',{n:topics.length}):t('noTopics'))+'</span></div>';
-  h+='<button class="primary sm" data-act="addcustom">'+t('addSubj')+'</button></section>';
-  return h;
+  return h+'<button class="primary sm" data-act="addcustom">'+t('addSubj')+'</button></section>';
 }
 function render(){
-  document.documentElement.lang=S.lang;document.documentElement.dir=S.lang==='ar'?'rtl':'ltr';
-  document.title=t('app');
+  document.documentElement.lang=S.lang;document.documentElement.dir=S.lang==='ar'?'rtl':'ltr';applyTheme();
+  document.title='Planny';
   const keep=window.scrollY;let body='',P=null;
-  if(view!=='setup'&&S.built){P=getPlan();body=view==='today'?vToday(P):view==='plan'?vPlan(P):vProgress(P);if(P.overflow&&view==='today')body='<p class="banner">'+t('overflow',{n:P.overflow})+'</p>'+body}
+  if(view!=='setup'&&S.built){P=getPlan();body=view==='today'?vToday(P):view==='plan'?vPlan(P):vProgress(P);if(P.overflow&&view==='today')body='<p class="banner warn">'+t('overflow',{n:P.overflow})+'</p>'+body}
   else{view='setup';body=vSetup()}
   document.getElementById('app').innerHTML=body;
   document.getElementById('langbtn').textContent=t('lang');
-  document.getElementById('ttl').textContent=t('app');
   document.querySelectorAll('#nav button').forEach(b=>{const v=b.dataset.v;b.querySelector('span').textContent=t(v);b.classList.toggle('on',v===view);b.disabled=!S.built&&v!=='setup'});
+  renderTimer();
   window.scrollTo(0,keep);
 }
 function updatePreview(){const n=parseTopics(draft.paste).length,el=document.getElementById('d_cnt');if(el)el.textContent=n?t('topicsFound',{n}):t('noTopics')}
+function fmtClock(s){s=Math.max(0,Math.ceil(s));return pad(Math.floor(s/60))+':'+pad(s%60)}
+function renderTimer(){
+  const el=document.getElementById('timer');if(!el)return;
+  if(!timer){el.classList.remove('on');el.innerHTML='';return}
+  const left=timer.paused?timer.left:(timer.end-Date.now())/1000;
+  el.classList.add('on');
+  el.innerHTML='<b id="tclk">'+fmtClock(left)+'</b><span>'+esc(timer.title)+'</span><button class="ghost" data-act="tpause">'+(timer.paused?t('resume'):t('pause'))+'</button><button class="ghost" data-act="tstop">'+t('stop')+'</button>';
+}
+function beep(){
+  try{const ctx=audioCtx||(audioCtx=new (window.AudioContext||window.webkitAudioContext)());[0,0.35,0.7].forEach(d=>{const o=ctx.createOscillator(),g=ctx.createGain();o.frequency.value=880;g.gain.value=0.2;o.connect(g);g.connect(ctx.destination);o.start(ctx.currentTime+d);o.stop(ctx.currentTime+d+0.2)})}catch(e){}
+  try{navigator.vibrate&&navigator.vibrate([200,100,200])}catch(e){}
+}
+function tick(){
+  if(!timer||timer.paused)return;
+  const left=(timer.end-Date.now())/1000;
+  const c=document.getElementById('tclk');if(c)c.textContent=fmtClock(left);
+  if(left<=0){beep();toast(t('timerDone'));timer=null;renderTimer();clearInterval(timerInt)}
+}
+function startTimer(key){
+  const P=getPlan();let ev=null;P.days.forEach(d=>d.events.forEach(e=>{if(e.key===key)ev=e}));if(!ev)return;
+  try{audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume()}catch(e){}
+  const secs=(ev.end-ev.start)*60;
+  timer={key,title:pick(ev.sub.name,S.lang)+' · '+evTitle(ev),end:Date.now()+secs*1000,paused:false,left:secs};
+  clearInterval(timerInt);timerInt=setInterval(tick,500);renderTimer();
+}
+function updateNext(){
+  if(view!=='today'||!curDay||selDate!==todayISO())return;
+  const el=document.getElementById('next');if(el)el.innerHTML=nextHtml(curDay);
+}
+setInterval(updateNext,20000);
 document.addEventListener('input',e=>{
   const el=e.target;
   if(el.id==='d_name')draft.name=el.value;else if(el.id==='d_goal')draft.goal=el.value;else if(el.id==='d_paste'){draft.paste=el.value;updatePreview()}
 });
 document.addEventListener('change',e=>{
   const el=e.target,f=el.dataset.f,a=el.dataset.act,p=S.profile;
+  if(el.id==='bkfile'){const fl=el.files&&el.files[0];if(!fl)return;const r=new FileReader();r.onload=()=>{try{const j=JSON.parse(r.result);if(!j||j.v!==1||!j.profile)throw 0;S=norm(j);save();view=S.built?'today':'setup';wz=1;selDate=null;render();toast(t('restored'))}catch(err){toast(t('badBackup'))}};r.readAsText(fl);return}
+  if(el.dataset.ref){const w=el.dataset.ref;if(el.value.trim())S.reflect[w]=el.value;else delete S.reflect[w];save();toast(t('refSaved'));return}
+  if(el.dataset.vl){S.videoLang=el.dataset.vl;save();return}
+  if(el.dataset.sz){const [i,k]=el.dataset.sz.split('|');if(p.seasons[i]){p.seasons[i][k]=el.value;save()}return}
+  if(a==='lk'){const r=S.subjects.find(x=>x.id===el.dataset.id);if(r){const u=safeUrl(el.value);if(u)r.link=u;else delete r.link;save()}return}
+  if(el.dataset.note!==undefined){const k=el.dataset.note;if(el.value.trim())S.notes[k]=el.value;else delete S.notes[k];save();return}
   if(el.id==='d_n'){draft.n=+el.value;return}if(el.id==='d_m'){draft.m=+el.value;return}
+  if(el.id==='calr'){calRange=el.value;return}
+  if(el.dataset.pace){p.pace=el.dataset.pace;save();render();return}
+  if(el.dataset.theme){S.theme=el.dataset.theme;save();render();return}
+  if(el.dataset.bz){const [i,k]=el.dataset.bz.split('|');if(p.busy[i]){p.busy[i][k]=el.value;save()}return}
+  if(el.dataset.bzd!==undefined){const i=+el.dataset.bzd;p.busy[i].days=[...document.querySelectorAll('[data-bzd="'+i+'"]:checked')].map(x=>+x.value);save();render();return}
+  if(el.dataset.pz){const [i,k]=el.dataset.pz.split('|');if(p.pauses[i]){p.pauses[i][k]=el.value;save()}return}
   if(f){
     if(f==='workDays'||f==='restDays'){p[f]=[...document.querySelectorAll('[data-f="'+f+'"]:checked')].map(x=>+x.value)}
     else if(f==='weeks'||f==='commute'||f==='windDown'){p[f]=Math.max(0,+el.value||0);if(f==='weeks')p.weeks=Math.min(26,Math.max(4,p.weeks))}
     else if(el.value)p[f]=el.value;
-    save();render();return;
+    if(f==='weeks'||f==='commute'||f==='windDown')el.value=p[f];
+    save();return;
   }
   const rec=S.subjects.find(r=>r.id===el.dataset.id);
   if(a==='subj'){
@@ -537,20 +880,71 @@ document.addEventListener('change',e=>{
 });
 document.addEventListener('click',async e=>{
   const b=e.target.closest('[data-act]');if(!b||b.tagName==='INPUT'||b.tagName==='SELECT')return;
-  const a=b.dataset.act;
+  const a=b.dataset.act,p=S.profile;
   if(a==='mark'){const k=b.dataset.k,v=b.dataset.v;if(S.status[k]===v)delete S.status[k];else S.status[k]=v;save();render()}
+  else if(a==='timer'){startTimer(b.dataset.k)}
+  else if(a==='copyq'){copyText(b.dataset.q);toast(t('copied'))}
+  else if(a==='mini'){const k=b.dataset.k;if(S.mini[k])delete S.mini[k];else S.mini[k]=true;EVOPEN.add(k);save();render()}
+  else if(a==='movebtn'){movingKey=movingKey===b.dataset.k?null:b.dataset.k;EVOPEN.add(b.dataset.k);render()}
+  else if(a==='movesave'){const k=b.dataset.k,d=document.getElementById('mv_d').value,tm=document.getElementById('mv_t').value;if(!d||!tm)return;S.moves[k]={iso:d,start:toMin(tm)};movingKey=null;save();render()}
+  else if(a==='moveunset'){delete S.moves[b.dataset.k];movingKey=null;save();render()}
+  else if(a==='late'){
+    const N=+document.getElementById('latesel').value,P=getPlan(),day=P.days.find(d=>d.iso===todayISO());if(!day)return;
+    const lim=toMin(day.ep.sleep)-15,n=nowMin();
+    day.events.filter(e=>S.status[e.key]!=='d'&&e.end>n).forEach(e=>{
+      const dur=e.end-e.start,st=e.start+N;
+      if(st+dur<=lim)S.moves[e.key]={iso:day.iso,start:st};
+      else if(st+10<=lim){S.moves[e.key]={iso:day.iso,start:st};S.mini[e.key]=true}
+    });
+    save();render();toast(t('lateDone'));
+  }
+  else if(a==='addseason'){const s0=todayISO();p.seasons.push({from:s0,to:addDays(s0,29),wake:p.wake,sleep:p.sleep,workStart:p.workStart,workEnd:p.workEnd,commute:p.commute});save();render()}
+  else if(a==='rmseason'){p.seasons.splice(+b.dataset.i,1);save();render()}
+  else if(a==='dlbackup'){
+    try{const blob=new Blob([JSON.stringify(S)],{type:'application/json'}),u=URL.createObjectURL(blob),x=document.createElement('a');x.href=u;x.download='planny-backup-'+todayISO()+'.json';document.body.appendChild(x);x.click();x.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);S.lastBackup=todayISO();save();render();toast(t('bkDone'))}catch(err){copyText(JSON.stringify(S));toast(t('copied'))}
+  }
+  else if(a==='snooze'){S.snooze=addDays(todayISO(),-7);save();render()}
+  else if(a==='sharecopy'){
+    const o={p:{...S.profile,start:undefined,pauses:[]},s:S.subjects};
+    try{copyText('PLN1:'+btoa(unescape(encodeURIComponent(JSON.stringify(o)))));toast(t('copied'))}catch(err){toast(t('shareBad'))}
+  }
+  else if(a==='shareuse'){
+    try{let c=document.getElementById('sh_in').value.trim();if(c.indexOf('PLN1:')!==0)throw 0;
+      const o=JSON.parse(decodeURIComponent(escape(atob(c.slice(5)))));if(!o||!o.p||!Array.isArray(o.s))throw 0;
+      const keep=S.profile.start;S.profile={...defaultProfile(),...o.p,start:keep,pauses:S.profile.pauses};['busy','seasons'].forEach(k=>{if(!Array.isArray(S.profile[k]))S.profile[k]=[]});
+      S.subjects=o.s.filter(r=>r&&r.id&&(r.cid?LIBMAP[r.cid]:Array.isArray(r.topics)));S.built=false;save();wz=1;render();toast(t('shareOk'))}
+    catch(err){toast(t('shareBad'))}
+  }
+  else if(a==='tpause'){if(timer){if(timer.paused){timer.end=Date.now()+timer.left*1000;timer.paused=false}else{timer.left=(timer.end-Date.now())/1000;timer.paused=true}renderTimer()}}
+  else if(a==='tstop'){timer=null;clearInterval(timerInt);renderTimer()}
   else if(a==='day'){selDate=addDays(selDate,+b.dataset.d);render()}
   else if(a==='gotoday'){selDate=null;render()}
   else if(a==='pw'){window._pw=+b.dataset.w;render()}
   else if(a==='openday'){selDate=b.dataset.d;view='today';render();window.scrollTo(0,0)}
+  else if(a==='copyday'&&curDay){
+    const L=S.lang;copyText('Planny · '+DAYS[L][dow(curDay.iso)]+' · '+fmtDate(curDay.iso,L)+'\n'+curDay.events.map(e=>fmtTime(e.start,L)+' – '+fmtTime(e.end,L)+'  '+pick(e.sub.name,L)+': '+evTitle(e)).join('\n'));toast(t('copiedDay'));
+  }
+  else if(a==='ics'){
+    const P=getPlan(),r=makeICS(P,calRange);if(!r.n){toast(t('calNone'));return}
+    try{const blob=new Blob([r.text],{type:'text/calendar'}),u=URL.createObjectURL(blob),x=document.createElement('a');x.href=u;x.download='planny.ics';document.body.appendChild(x);x.click();x.remove();setTimeout(()=>URL.revokeObjectURL(u),4000)}catch(err){copyText(r.text);toast(t('copied'))}
+  }
   else if(a==='rmc'){S.subjects=S.subjects.filter(r=>r.id!==b.dataset.id);save();render()}
+  else if(a==='tpl'){
+    const tp=TEMPLATES.find(x=>x.id===b.dataset.id),keepC=S.subjects.filter(r=>!r.cid);
+    S.subjects=tp.items.map(id=>{const c=LIBMAP[id];return {id:c.id,cid:c.id,n:c.n,m:c.m,slot:c.slot,startPage:1,pages:c.kind==='quran'?2:3}}).concat(keepC);save();render();
+  }
+  else if(a==='addbusy'){p.busy.push({name:'',days:[0,1,2,3,4,5,6],start:'12:00',end:'13:00'});save();render()}
+  else if(a==='rmbusy'){p.busy.splice(+b.dataset.i,1);save();render()}
+  else if(a==='addpause'){const s=todayISO();p.pauses.push({from:s,to:addDays(s,6)});save();render()}
+  else if(a==='rmpause'){p.pauses.splice(+b.dataset.i,1);save();render()}
+  else if(a==='wnext'){wz=Math.min(3,wz+1);render();window.scrollTo(0,0)}
+  else if(a==='wback'){wz=Math.max(1,wz-1);render();window.scrollTo(0,0)}
   else if(a==='mkprompt'){
     const goal=(draft.goal||draft.name).trim();if(!goal){document.getElementById('d_goal').focus();return}
     draft.prompt=buildPrompt({goal,n:draft.n,m:draft.m,weeks:S.profile.weeks,lang:S.lang});render();
     const el=document.getElementById('cpanel');if(el)el.scrollIntoView({block:'start'});
   }
-  else if(a==='copyprompt'){copyText(draft.prompt);toast(t('copied'))}
-  else if(a==='copyprompt2'){copyText(draft.prompt);toast(t('copied'))}
+  else if(a==='copyprompt'||a==='copyprompt2'){copyText(draft.prompt);toast(t('copied'))}
   else if(a==='paste'){
     let ok=false;
     try{const tx=await navigator.clipboard.readText();if(tx){draft.paste=tx;ok=true}}catch(err){}
@@ -564,20 +958,34 @@ document.addEventListener('click',async e=>{
     S.subjects.push({id:'u'+Date.now(),cid:null,name,n:draft.n,m:draft.m,slot:'evening',topics});
     draft={name:'',goal:'',n:3,m:30,prompt:'',paste:''};save();render();
   }
-  else if(a==='build'){if(!S.subjects.length){toast(t('needOne'));return}S.built=true;view='today';selDate=null;save();render();window.scrollTo(0,0);toast(t('built'))}
-  else if(a==='copybackup'){copyText(JSON.stringify(S));toast(t('copied'))}
+  else if(a==='build'){if(!S.subjects.length){toast(t('needOne'));return}S.built=true;if(!S.builtAt)S.builtAt=todayISO();view='today';selDate=null;save();render();window.scrollTo(0,0);toast(t('built'))}
+  else if(a==='copybackup'){copyText(JSON.stringify(S));S.lastBackup=todayISO();save();toast(t('copied'))}
   else if(a==='restore'){
-    try{const j=JSON.parse(document.getElementById('bk').value);if(!j||j.v!==1||!j.profile)throw 0;S=j;save();view=S.built?'today':'setup';selDate=null;render();toast(t('restored'))}catch(err){toast(t('badBackup'))}
+    try{const j=JSON.parse(document.getElementById('bk').value);if(!j||j.v!==1||!j.profile)throw 0;S=norm(j);save();view=S.built?'today':'setup';wz=1;selDate=null;render();toast(t('restored'))}catch(err){toast(t('badBackup'))}
   }
   else if(a==='reset'){
     const bar=document.getElementById('confirm');bar.innerHTML='<p>'+t('resetAsk')+'</p><div class="row"><button class="ghost danger" data-act="reset2">'+t('yes')+'</button><button class="ghost" data-act="cancel">'+t('cancel')+'</button></div>';bar.classList.add('on');
   }
-  else if(a==='reset2'){const l=S.lang;S={v:1,lang:l,profile:defaultProfile(),subjects:[],status:{},built:false};save();view='setup';document.getElementById('confirm').classList.remove('on');render()}
+  else if(a==='reset2'){const l=S.lang;S=fresh();S.lang=l;save();view='setup';wz=1;document.getElementById('confirm').classList.remove('on');render()}
   else if(a==='cancel'){document.getElementById('confirm').classList.remove('on')}
+  else if(a==='hideinstall'){S.hideInstall=true;save();render()}
+  else if(a==='doinstall'&&deferred){deferred.prompt();try{await deferred.userChoice}catch(err){}deferred=null;render()}
+  else if(a==='howinstall'){openSheet()}
+  else if(a==='closesheet'){document.getElementById('sheet').classList.remove('on')}
 });
-document.addEventListener('toggle',e=>{const d=e.target;if(d.classList&&d.classList.contains('sec')){OPEN.touched=true;document.querySelectorAll('details.sec').forEach(x=>{if(x.open)OPEN.add(x.dataset.sid);else OPEN.delete(x.dataset.sid)})}},true);
+function openSheet(){
+  const el=document.getElementById('sheet');
+  el.innerHTML='<div class="sh"><h3>'+t('install')+'</h3><p><b>'+t('iAndroid')+'</b><br>'+t('iAndroidT')+'</p><p><b>'+t('iIphone')+'</b><br>'+t('iIphoneT')+'</p><p><b>'+t('iPc')+'</b><br>'+t('iPcT')+'</p><button class="primary sm" data-act="closesheet">'+t('close')+'</button></div>';
+  el.classList.add('on');
+}
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferred=e;if(view==='today'||view==='setup')render()});
+window.addEventListener('appinstalled',()=>{deferred=null;S.hideInstall=true;save();render()});
+document.addEventListener('toggle',e=>{const d=e.target;if(d.classList&&d.classList.contains('evd')){if(d.open)EVOPEN.add(d.dataset.k);else EVOPEN.delete(d.dataset.k)}
+  if(d.classList&&d.classList.contains('sec')){OPEN.touched=true;document.querySelectorAll('details.sec').forEach(x=>{if(x.open)OPEN.add(x.dataset.sid);else OPEN.delete(x.dataset.sid)})}},true);
 document.getElementById('langbtn').addEventListener('click',()=>{S.lang=S.lang==='ar'?'en':'ar';save();render()});
-document.querySelectorAll('#nav button').forEach(b=>b.addEventListener('click',()=>{if(b.disabled)return;view=b.dataset.v;if(view==='today')selDate=null;render();window.scrollTo(0,0)}));
+document.getElementById('themebtn').addEventListener('click',()=>{S.theme=S.theme==='auto'?'light':S.theme==='light'?'dark':'auto';save();render();toast(t('theme')+': '+t(S.theme==='auto'?'tAuto':S.theme==='light'?'tLight':'tDark'))});
+document.querySelectorAll('#nav button').forEach(b=>b.addEventListener('click',()=>{if(b.disabled)return;view=b.dataset.v;if(view==='today')selDate=null;if(view==='setup')wz=1;render();window.scrollTo(0,0)}));
+try{if('serviceWorker' in navigator&&location.protocol.indexOf('http')===0)navigator.serviceWorker.register('./sw.js').catch(()=>{})}catch(e){}
 render();
 
 </script></body></html>
